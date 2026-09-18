@@ -1,6 +1,8 @@
 import { getApiClient, type ApiClient } from "@/lib/api/client";
 import { endpoints } from "@/lib/api/endpoints";
 import {
+  registerInputSchema,
+  registerResponseSchema,
   loginInputSchema,
   loginResponseSchema,
   meResponseSchema,
@@ -13,6 +15,16 @@ export function login(
   return client.request(
     { endpoint: endpoints.login(), body: loginInputSchema.parse(input) },
     loginResponseSchema,
+    (dto) => dto.data,
+  );
+}
+export function register(
+  input: z.output<typeof registerInputSchema>,
+  client: ApiClient = getApiClient(),
+) {
+  return client.request(
+    { endpoint: endpoints.register(), body: registerInputSchema.parse(input) },
+    registerResponseSchema,
     (dto) => dto.data,
   );
 }

@@ -17,6 +17,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
+import Link from "next/link";
 function BackendLogin() {
   const router = useRouter();
   const form = useForm<z.output<typeof loginInputSchema>>({
@@ -33,9 +34,10 @@ function BackendLogin() {
   return (
     <main className="flex min-h-screen items-center justify-center p-5">
       <Card className="w-full max-w-md">
-        <CardContent className="space-y-6">
+          <CardContent className="space-y-6">
           <BrandMark />
-          <h1 className="text-2xl font-semibold">{t("loginAccountTitle")}</h1>
+            <h1 className="text-2xl font-semibold">{t("loginAccountTitle")}</h1>
+            <p className="text-sm text-muted-foreground">{t("registerExisting")} <Link className="font-medium text-primary hover:underline" href="/register">{t("registerLoginLink")}</Link></p>
           <form
             className="space-y-4"
             aria-busy={mutation.isPending}

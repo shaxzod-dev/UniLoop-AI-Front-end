@@ -9,6 +9,7 @@ function endpoint<N extends string>(
   return { name, method, path, params };
 }
 export const endpoints = {
+  register: () => endpoint("register", "POST", "/auth/register"),
   login: () => endpoint("login", "POST", "/auth/login"),
   identity: () => endpoint("identity", "GET", "/auth/me"),
   studentDashboard: () =>
