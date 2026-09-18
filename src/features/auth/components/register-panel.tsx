@@ -43,7 +43,7 @@ export function RegisterPanel() {
     mutationFn: (values: FormValues) => register({ name: values.name, email: values.email, password: values.password, role: values.role }),
     onSuccess: (data) => {
       useAuthStore.getState().setSession(data.accessToken, data.user);
-      router.replace(getDashboardPath(data.user.role));
+      router.replace("/onboarding");
     },
   });
 

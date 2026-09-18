@@ -6,6 +6,8 @@ import {
   loginInputSchema,
   loginResponseSchema,
   meResponseSchema,
+  onboardingInputSchema,
+  onboardingResponseSchema,
 } from "@/features/auth/contracts";
 import { z } from "zod";
 export function login(
@@ -32,6 +34,16 @@ export function getIdentity(client: ApiClient = getApiClient()) {
   return client.request(
     { endpoint: endpoints.identity() },
     meResponseSchema,
+    (dto) => dto.data,
+  );
+}
+export function completeOnboarding(
+  input: z.output<typeof onboardingInputSchema>,
+  client: ApiClient = getApiClient(),
+) {
+  return client.request(
+    { endpoint: endpoints.onboarding(), body: onboardingInputSchema.parse(input) },
+    onboardingResponseSchema,
     (dto) => dto.data,
   );
 }

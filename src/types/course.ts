@@ -35,6 +35,34 @@ export interface CourseSummary {
   studentCount: number;
   outcomeCount: number;
 }
+export type EnrollmentStatus =
+  | "AVAILABLE"
+  | "PENDING"
+  | "APPROVED"
+  | "REJECTED"
+  | "ENROLLED";
+export interface CourseCatalogItem extends CourseSummary {
+  description: string;
+  professorName: string;
+  enrollmentStatus: EnrollmentStatus;
+  enrollmentRequestId: string | null;
+  requestedAt: string | null;
+  decisionNote: string | null;
+}
+export interface EnrollmentRequest {
+  id: string;
+  courseId: string;
+  studentId: string;
+  studentName: string;
+  university: string | null;
+  faculty: string | null;
+  major: string | null;
+  studyYear: number | null;
+  status: "PENDING" | "APPROVED" | "REJECTED";
+  requestedAt: string;
+  decidedAt: string | null;
+  decisionNote: string | null;
+}
 export interface CourseDetail extends CourseSummary {
   description: string;
   professor: ProfessorSummary;

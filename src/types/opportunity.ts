@@ -55,6 +55,9 @@ export interface Opportunity {
   gapSkillIds: string[];
   collaborative: boolean;
   relatedUserId: string | null;
+  source?: string | null;
+  sourceUrl?: string | null;
+  clubMember?: boolean;
 }
 export interface MatchingBreakdown {
   targetRoleAlignment: number;
@@ -82,4 +85,10 @@ export interface OpportunityDashboard {
 }
 export interface RecommendationUpdate {
   status: RecommendationStatus;
+}
+export interface ClubInput {
+  title: string;
+  description: string;
+  topic: string;
+  skills?: string[];
 }

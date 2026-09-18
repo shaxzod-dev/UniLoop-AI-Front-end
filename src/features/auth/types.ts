@@ -15,4 +15,5 @@ export interface AuthSession {
 }
 export interface AuthenticatedUser extends AuthUser {
   profileId: string;
+  onboardingCompleted: boolean;
 }

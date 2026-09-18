@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef } from "react";
-import { Bookmark, Check, X } from "lucide-react";
+import { Bookmark, Check, ExternalLink, X } from "lucide-react";
 import { MutationFeedback } from "@/components/feedback/mutation-feedback";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -12,7 +12,10 @@ import {
   readinessPresentation,
   recommendationPresentation,
 } from "@/features/opportunities/presentation";
-import { useUpdateRecommendation } from "@/features/opportunities/queries";
+import {
+  useJoinClub,
+  useUpdateRecommendation,
+} from "@/features/opportunities/queries";
 import { t } from "@/i18n";
 import type {
   CareerProfile,
@@ -33,6 +36,7 @@ export function RecommendationCard({
   primary?: boolean;
 }) {
   const update = useUpdateRecommendation();
+  const join = useJoinClub();
   const locked = useRef(false);
   const { opportunity } = recommendation;
   const type = opportunityTypePresentation[opportunity.type];
@@ -47,6 +51,7 @@ export function RecommendationCard({
     recommendation.status === "NEW" || recommendation.status === "SAVED";
   const career =
     opportunity.type === "INTERNSHIP" || opportunity.type === "JOB";
+  const club = opportunity.type === "CLUB";
   function changeStatus(nextStatus: RecommendationStatus) {
     if (locked.current || update.isPending) return;
     locked.current = true;
@@ -95,13 +100,21 @@ export function RecommendationCard({
         {career ? (
           <div className="space-y-1 text-xs text-muted-foreground">
             <p>
-              {t("opportunitySource")}: {t("opportunitySourceUnavailable")}
+              {t("opportunitySource")}: {opportunity.source ?? t("opportunitySourceUnavailable")}
             </p>
             <p>
               {t("navCareerReadiness")}:{" "}
               {t(readinessPresentation[profile.readinessStage].label)}
             </p>
           </div>
+        ) : null}
+        {career && opportunity.sourceUrl ? (
+          <Button asChild className="min-h-11" variant="outline">
+            <a href={opportunity.sourceUrl} rel="noreferrer" target="_blank">
+              <ExternalLink aria-hidden="true" />
+              HH.uz da ochish
+            </a>
+          </Button>
         ) : null}
         <MatchingExplanation
           matching={recommendation.matching}
@@ -122,16 +135,29 @@ export function RecommendationCard({
                 {t("actionSave")}
               </Button>
             ) : null}
-            <Button
-              className="min-h-11"
-              aria-label={`${t("acceptRecommendation")}: ${opportunity.title}`}
-              disabled={update.isPending}
-              onClick={() => changeStatus("ACCEPTED")}
-              type="button"
-            >
-              <Check aria-hidden="true" />
-              {t("acceptRecommendation")}
-            </Button>
+            {club ? (
+              <Button
+                className="min-h-11"
+                aria-label={`${t("joinClub")}: ${opportunity.title}`}
+                disabled={join.isPending}
+                onClick={() => join.mutate(opportunity.id)}
+                type="button"
+              >
+                <Check aria-hidden="true" />
+                {t("joinClub")}
+              </Button>
+            ) : (
+              <Button
+                className="min-h-11"
+                aria-label={`${t("acceptRecommendation")}: ${opportunity.title}`}
+                disabled={update.isPending}
+                onClick={() => changeStatus("ACCEPTED")}
+                type="button"
+              >
+                <Check aria-hidden="true" />
+                {t("acceptRecommendation")}
+              </Button>
+            )}
             <Button
               className="min-h-11"
               aria-label={`${t("dismissRecommendation")}: ${opportunity.title}`}
@@ -145,12 +171,23 @@ export function RecommendationCard({
             </Button>
           </div>
         ) : null}
+        {club && opportunity.clubMember ? (
+          <p className="text-sm text-primary">{t("clubJoined")}</p>
+        ) : null}
         <MutationFeedback
           pending={update.isPending}
           error={update.isError}
           success={update.isSuccess}
           successMessage="recommendationUpdated"
         />
+        {club ? (
+          <MutationFeedback
+            error={join.isError}
+            pending={join.isPending}
+            success={join.isSuccess}
+            successMessage="clubJoined"
+          />
+        ) : null}
       </CardContent>
     </Card>
   );

@@ -28,7 +28,7 @@ function BackendLogin() {
     mutationFn: (input: z.output<typeof loginInputSchema>) => login(input),
     onSuccess: (data) => {
       useAuthStore.getState().setSession(data.accessToken, data.user);
-      router.replace(getDashboardPath(data.user.role));
+      router.replace(data.user.onboardingCompleted ? getDashboardPath(data.user.role) : "/onboarding");
     },
   });
   return (

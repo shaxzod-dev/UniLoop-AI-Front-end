@@ -28,6 +28,35 @@ export const courseSummaryDtoSchema = z.object({
   studentCount: z.number().int().nonnegative(),
   outcomeCount: z.number().int().nonnegative(),
 });
+const enrollmentStatusSchema = z.enum([
+  "AVAILABLE",
+  "PENDING",
+  "APPROVED",
+  "REJECTED",
+  "ENROLLED",
+]);
+export const courseCatalogItemSchema = courseSummaryDtoSchema.extend({
+  description: z.string(),
+  professorName: z.string(),
+  enrollmentStatus: enrollmentStatusSchema,
+  enrollmentRequestId: idSchema.nullable(),
+  requestedAt: timestampSchema.nullable(),
+  decisionNote: z.string().nullable(),
+});
+export const enrollmentRequestSchema = z.object({
+  id: idSchema,
+  courseId: idSchema,
+  studentId: idSchema,
+  studentName: z.string(),
+  university: z.string().nullable(),
+  faculty: z.string().nullable(),
+  major: z.string().nullable(),
+  studyYear: z.number().int().nullable(),
+  status: z.enum(["PENDING", "APPROVED", "REJECTED"]),
+  requestedAt: timestampSchema,
+  decidedAt: timestampSchema.nullable(),
+  decisionNote: z.string().nullable(),
+});
 export const courseDetailDtoSchema = courseSummaryDtoSchema.extend({
   description: z.string(),
   professor: professorSchema,
@@ -61,6 +90,21 @@ export const dashboardSchema = z.object({
 });
 export const courseListResponseSchema = dtoEnvelope(
   z.array(courseSummaryDtoSchema),
+);
+export const courseCatalogResponseSchema = dtoEnvelope(
+  z.array(courseCatalogItemSchema),
+);
+export const enrollmentRequestsResponseSchema = dtoEnvelope(
+  z.array(enrollmentRequestSchema),
+);
+export const enrollmentRequestResponseSchema = dtoEnvelope(
+  enrollmentRequestSchema.omit({
+    studentName: true,
+    university: true,
+    faculty: true,
+    major: true,
+    studyYear: true,
+  }).extend({ status: enrollmentStatusSchema }),
 );
 export const courseResponseSchema = dtoEnvelope(courseDetailDtoSchema);
 export const dashboardResponseSchema = dtoEnvelope(dashboardSchema);

@@ -9,6 +9,8 @@ import {
 } from "@/features/auth/query-context";
 import {
   getOpportunityDashboard,
+  createClub,
+  joinClub,
   getRecommendations,
   requestEndorsement,
   updateCareerProfile,
@@ -23,6 +25,7 @@ import {
 import type {
   CareerProfileUpdate,
   RecommendationUpdate,
+  ClubInput,
 } from "@/types/opportunity";
 import type { EndorsementRequestInput } from "@/types/endorsement";
 
@@ -51,6 +54,26 @@ export function useUpdateCareerProfile() {
         userId,
         env.useMocks ? getDemoUser("PROFESSOR").id : undefined,
       ),
+  );
+}
+export function useCreateClub() {
+  return useRoleMutation(
+    "STUDENT",
+    (input: ClubInput) => createClub(input),
+    (_data, _input, userId) => [
+      queryKeys.opportunities.dashboard(userId),
+      queryKeys.opportunities.recommendations(userId),
+    ],
+  );
+}
+export function useJoinClub() {
+  return useRoleMutation(
+    "STUDENT",
+    (clubId: string) => joinClub(clubId),
+    (_data, _input, userId) => [
+      queryKeys.opportunities.dashboard(userId),
+      queryKeys.opportunities.recommendations(userId),
+    ],
   );
 }
 export function useUpdateRecommendation() {

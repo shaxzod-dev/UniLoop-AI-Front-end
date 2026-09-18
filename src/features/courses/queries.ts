@@ -9,11 +9,16 @@ import { env } from "@/lib/env";
 import { getDemoUser } from "@/features/auth/demo-users";
 import type { UserRole } from "@/features/auth/types";
 import {
+  createProfessorCourse,
   extractCourseOutcomes,
   generateCourseAssessment,
+  getCourseCatalog,
   getAcademicDashboard,
   getCourse,
   getCourses,
+  getEnrollmentRequests,
+  requestEnrollment,
+  decideEnrollmentRequest,
   uploadCourseMaterial,
 } from "@/features/courses/api";
 import { queryKeys } from "@/lib/api/query-keys";
@@ -46,6 +51,63 @@ export function useCourses(role: UserRole) {
     queryFn: ({ signal }) => getCourses(role, signal),
     enabled: context.enabled,
   });
+}
+export function useCourseCatalog() {
+  const context = useQueryContext("STUDENT");
+  return useQuery({
+    queryKey: queryKeys.students.courseCatalog(context.userId),
+    queryFn: ({ signal }) => getCourseCatalog(signal),
+    enabled: context.enabled,
+  });
+}
+export function useCreateProfessorCourse() {
+  return useRoleMutation(
+    "PROFESSOR",
+    (input: { title: string; code: string; description?: string }) =>
+      createProfessorCourse(input),
+    (_data, _input, professorId) => [
+      queryKeys.professors.courses(professorId),
+      queryKeys.professors.dashboard(professorId),
+    ],
+  );
+}
+export function useEnrollmentRequests(courseId: string) {
+  const context = useQueryContext("PROFESSOR");
+  return useQuery({
+    queryKey: queryKeys.professors.enrollmentRequests(context.userId, courseId),
+    queryFn: ({ signal }) => getEnrollmentRequests(courseId, signal),
+    enabled: context.enabled && !!courseId,
+  });
+}
+export function useRequestEnrollment(courseId: string) {
+  return useRoleMutation(
+    "STUDENT",
+    () => requestEnrollment(courseId),
+    (_data, _input, studentId) => [
+      queryKeys.students.courseCatalog(studentId),
+      queryKeys.students.courses(studentId),
+      queryKeys.students.dashboard(studentId),
+    ],
+  );
+}
+export function useDecideEnrollmentRequest(courseId: string) {
+  return useRoleMutation(
+    "PROFESSOR",
+    ({ requestId, ...decision }: {
+      requestId: string;
+      status: "APPROVED" | "REJECTED";
+      feedback?: string;
+    }) => decideEnrollmentRequest(courseId, requestId, decision),
+    (data, _input, professorId) => [
+      queryKeys.professors.enrollmentRequests(professorId, courseId),
+      queryKeys.professors.courses(professorId),
+      queryKeys.professors.dashboard(professorId),
+      queryKeys.courses.detail("PROFESSOR", professorId, courseId),
+      queryKeys.students.courseCatalog(data.studentId),
+      queryKeys.students.courses(data.studentId),
+      queryKeys.students.dashboard(data.studentId),
+    ],
+  );
 }
 export function useCourse(courseId: string, role: UserRole) {
   const context = useQueryContext(role);
