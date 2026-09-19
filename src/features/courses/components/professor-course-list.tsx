@@ -7,6 +7,7 @@ import { PageContainer } from "@/components/shared/page-container";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import Link from "next/link";
 import { ProfessorCourseCard } from "@/features/courses/components/professor-course-card";
 import { useCourses, useCreateProfessorCourse } from "@/features/courses/queries";
 import { t } from "@/i18n";
@@ -46,6 +47,7 @@ export function ProfessorCourseList() {
           <CardTitle>{t("createCourse")}</CardTitle>
         </CardHeader>
         <CardContent>
+          <Button asChild className="mb-4"><Link href="/professor/courses/new">To‘liq kurs yaratish</Link></Button>
           <form
             className="grid gap-3 sm:grid-cols-[1fr_150px_auto]"
             onSubmit={(event) => {

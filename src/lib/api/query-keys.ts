@@ -17,6 +17,8 @@ export const queryKeys = {
     courses: (studentId: string) => ["students", studentId, "courses"] as const,
     courseCatalog: (studentId: string) =>
       ["students", studentId, "course-catalog"] as const,
+    recommendedCourses: (studentId: string) =>
+      ["students", studentId, "recommended-courses"] as const,
   },
   professors: {
     dashboard: (professorId: string) =>

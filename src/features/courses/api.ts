@@ -17,12 +17,17 @@ import {
   materialInputSchema,
   materialSchema,
   outcomeSchema,
+  courseAuthoringInputSchema,
+  type CourseAuthoringInput,
+  aiSuggestionResponseSchema,
+  recommendationResponseSchema,
 } from "@/features/courses/contracts";
 import { adaptAssessment } from "@/features/assessments/adapters";
 import { assessmentResponseSchema } from "@/features/assessments/contracts";
 import { getApiClient, type ApiClient } from "@/lib/api/client";
 import { endpoints } from "@/lib/api/endpoints";
 import { dtoEnvelope } from "@/lib/api/schemas";
+import { timestampSchema } from "@/lib/api/schemas";
 import type { AssessmentType } from "@/types/assessment";
 import type {
   CourseCatalogItem,
@@ -76,6 +81,22 @@ export function createProfessorCourse(
     dtoEnvelope(courseSummaryDtoSchema),
     (dto) => adaptCourseSummary(dto.data),
   );
+}
+export function updateProfessorCourse(courseId: string, input: CourseAuthoringInput, client: ApiClient = getApiClient()) {
+  const body = courseAuthoringInputSchema.parse(input);
+  return client.request({ endpoint: endpoints.updateProfessorCourse(courseId), role: "PROFESSOR", body }, courseResponseSchema, (dto) => adaptCourseDetail(dto.data));
+}
+export function publishProfessorCourse(courseId: string, client: ApiClient = getApiClient()) {
+  return client.request({ endpoint: endpoints.publishProfessorCourse(courseId), role: "PROFESSOR" }, courseResponseSchema, (dto) => adaptCourseDetail(dto.data));
+}
+export function requestCourseAiSuggestions(courseId: string, instruction?: string, client: ApiClient = getApiClient()) {
+  return client.request({ endpoint: endpoints.courseAiSuggestions(courseId), role: "PROFESSOR", body: instruction ? { instruction } : {} }, aiSuggestionResponseSchema, (dto) => dto.data);
+}
+export function approveCourseAiSuggestion(courseId: string, suggestionId: string, approvedDraft: CourseAuthoringInput, client: ApiClient = getApiClient()) {
+  return client.request({ endpoint: endpoints.approveCourseAiSuggestion(courseId, suggestionId), role: "PROFESSOR", body: { approved: true, approvedDraft } }, dtoEnvelope(z.object({ id: z.string(), courseId: z.string(), approved: z.boolean(), approvedAt: timestampSchema.nullable() })), (dto) => dto.data);
+}
+export function getRecommendedCourses(signal?: AbortSignal, client: ApiClient = getApiClient()) {
+  return client.request({ endpoint: endpoints.recommendedCourses(), role: "STUDENT", signal }, recommendationResponseSchema, (dto) => dto.data);
 }
 export function getCourseCatalog(
   signal?: AbortSignal,

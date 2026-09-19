@@ -21,6 +21,7 @@ export const endpoints = {
     endpoint("studentCourses", "GET", "/students/me/courses"),
   courseCatalog: () =>
     endpoint("courseCatalog", "GET", "/students/me/course-catalog"),
+  recommendedCourses: () => endpoint("recommendedCourses", "GET", "/students/me/recommended-courses"),
   requestEnrollment: (courseId: string) =>
     endpoint(
       "requestEnrollment",
@@ -32,6 +33,11 @@ export const endpoints = {
     endpoint("professorCourses", "GET", "/professors/me/courses"),
   createProfessorCourse: () =>
     endpoint("createProfessorCourse", "POST", "/professors/me/courses"),
+  updateProfessorCourse: (courseId: string) => endpoint("updateProfessorCourse", "PATCH", `/professors/me/courses/${segment(courseId)}`, { courseId }),
+  publishProfessorCourse: (courseId: string) => endpoint("publishProfessorCourse", "POST", `/professors/me/courses/${segment(courseId)}/publish`, { courseId }),
+  archiveProfessorCourse: (courseId: string) => endpoint("archiveProfessorCourse", "POST", `/professors/me/courses/${segment(courseId)}/archive`, { courseId }),
+  courseAiSuggestions: (courseId: string) => endpoint("courseAiSuggestions", "POST", `/professors/me/courses/${segment(courseId)}/ai-suggestions`, { courseId }),
+  approveCourseAiSuggestion: (courseId: string, suggestionId: string) => endpoint("approveCourseAiSuggestion", "POST", `/professors/me/courses/${segment(courseId)}/ai-suggestions/${segment(suggestionId)}/approval`, { courseId, suggestionId }),
   enrollmentRequests: (courseId: string) =>
     endpoint(
       "enrollmentRequests",

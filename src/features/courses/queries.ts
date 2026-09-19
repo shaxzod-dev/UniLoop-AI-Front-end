@@ -20,9 +20,15 @@ import {
   requestEnrollment,
   decideEnrollmentRequest,
   uploadCourseMaterial,
+  updateProfessorCourse,
+  publishProfessorCourse,
+  requestCourseAiSuggestions,
+  approveCourseAiSuggestion,
+  getRecommendedCourses,
 } from "@/features/courses/api";
 import { queryKeys } from "@/lib/api/query-keys";
 import type { AssessmentType } from "@/types/assessment";
+import type { CourseAuthoringInput } from "@/features/courses/contracts";
 
 function useAcademicDashboard(role: UserRole) {
   const context = useQueryContext(role);
@@ -59,6 +65,25 @@ export function useCourseCatalog() {
     queryFn: ({ signal }) => getCourseCatalog(signal),
     enabled: context.enabled,
   });
+}
+export function useRecommendedCourses() {
+  const context = useQueryContext("STUDENT");
+  return useQuery({ queryKey: queryKeys.students.recommendedCourses(context.userId), queryFn: ({ signal }) => getRecommendedCourses(signal), enabled: context.enabled });
+}
+function authoringKeys(professorId: string, courseId: string) {
+  return [queryKeys.professors.courses(professorId), queryKeys.professors.dashboard(professorId), queryKeys.courses.detail("PROFESSOR", professorId, courseId)];
+}
+export function useUpdateProfessorCourse(courseId: string) {
+  return useRoleMutation("PROFESSOR", (input: CourseAuthoringInput) => updateProfessorCourse(courseId, input), (_data, _input, professorId) => authoringKeys(professorId, courseId));
+}
+export function usePublishProfessorCourse(courseId: string) {
+  return useRoleMutation("PROFESSOR", () => publishProfessorCourse(courseId), (_data, _input, professorId) => [...authoringKeys(professorId, courseId), queryKeys.students.courseCatalog(getDemoUser("STUDENT").id), queryKeys.students.recommendedCourses(getDemoUser("STUDENT").id)]);
+}
+export function useCourseAiSuggestions(courseId: string) {
+  return useRoleMutation("PROFESSOR", (instruction?: string) => requestCourseAiSuggestions(courseId, instruction), (_data, _input, professorId) => authoringKeys(professorId, courseId));
+}
+export function useApproveCourseAiSuggestion(courseId: string) {
+  return useRoleMutation("PROFESSOR", ({ suggestionId, draft }: { suggestionId: string; draft: CourseAuthoringInput }) => approveCourseAiSuggestion(courseId, suggestionId, draft), (_data, _input, professorId) => authoringKeys(professorId, courseId));
 }
 export function useCreateProfessorCourse() {
   return useRoleMutation(
