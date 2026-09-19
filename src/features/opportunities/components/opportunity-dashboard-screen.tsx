@@ -1,5 +1,6 @@
 "use client";
 
+import { MapPin, Search, UsersRound } from "lucide-react";
 import { useState } from "react";
 import { ContextState } from "@/components/feedback/context-state";
 import { EmptyState } from "@/components/feedback/empty-state";
@@ -8,6 +9,7 @@ import { LoadingState } from "@/components/feedback/loading-state";
 import { PageContainer } from "@/components/shared/page-container";
 import { MutationFeedback } from "@/components/feedback/mutation-feedback";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { AcademicEvidenceLinks } from "@/features/opportunities/components/academic-evidence-links";
@@ -21,18 +23,24 @@ import { RecommendationCard } from "@/features/opportunities/components/recommen
 import { SkillEvidenceList } from "@/features/opportunities/components/skill-evidence-list";
 import {
   useCreateClub,
+  useClubCatalog,
+  useJoinClub,
   useOpportunityDashboard,
 } from "@/features/opportunities/queries";
 import { t } from "@/i18n";
+import type { ClubCatalogItem } from "@/types/opportunity";
 
 type OpportunitySection = "profile" | "jobs" | "network" | "clubs" | "endorsements";
 
 export function OpportunityDashboardScreen({ section }: { section?: OpportunitySection }) {
   const dashboard = useOpportunityDashboard();
   const createClub = useCreateClub();
+  const clubs = useClubCatalog();
+  const joinClub = useJoinClub();
   const [clubName, setClubName] = useState("");
   const [clubTopic, setClubTopic] = useState("");
   const [clubDescription, setClubDescription] = useState("");
+  const [clubSearch, setClubSearch] = useState("");
   if (dashboard.isLoading)
     return (
       <PageContainer className="py-8">
@@ -68,6 +76,12 @@ export function OpportunityDashboardScreen({ section }: { section?: OpportunityS
     ? [primary, ...connections.filter((item) => item.id !== primary.id)]
     : connections;
   const shows = (name: OpportunitySection) => !section || section === name;
+  const visibleClubs = (clubs.data ?? []).filter((club) =>
+    [club.title, club.description, club.creatorName, ...club.skills]
+      .join(" ")
+      .toLocaleLowerCase("uz")
+      .includes(clubSearch.trim().toLocaleLowerCase("uz")),
+  );
   return (
     <PageContainer className="space-y-8 py-8 sm:py-10">
       <header>
@@ -150,6 +164,20 @@ export function OpportunityDashboardScreen({ section }: { section?: OpportunityS
             />
           </CardContent>
         </Card>
+        <div className="mt-8 space-y-4">
+          <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-end">
+            <div>
+              <h2 className="font-heading text-xl font-semibold">{t("allClubs")}</h2>
+              <p className="mt-1 text-sm text-muted-foreground">{t("clubsCatalogDescription")}</p>
+            </div>
+            <div className="relative w-full sm:max-w-sm">
+              <Search aria-hidden="true" className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+              <Input aria-label={t("clubSearch")} className="pl-9" onChange={(event) => setClubSearch(event.target.value)} placeholder={t("clubSearch")} value={clubSearch} />
+            </div>
+          </div>
+          {clubs.isLoading ? <LoadingState cards={3} /> : clubs.isError ? <ErrorState retry={() => void clubs.refetch()} /> : visibleClubs.length ? <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">{visibleClubs.map((club) => <ClubCatalogCard club={club} joinPending={joinClub.isPending} key={club.id} onJoin={() => joinClub.mutate(club.id)} />)}</div> : <Card><CardContent className="pt-6 text-sm text-muted-foreground">{t("noClubsFound")}</CardContent></Card>}
+          <MutationFeedback error={joinClub.isError} pending={joinClub.isPending} success={joinClub.isSuccess} successMessage="clubJoined" />
+        </div>
       </section> : null}
       {shows("profile") ? <section className="space-y-4">
         <h2 className="font-heading text-xl font-semibold">
@@ -235,4 +263,9 @@ export function OpportunityDashboardScreen({ section }: { section?: OpportunityS
       </section> : null}
     </PageContainer>
   );
+}
+
+function ClubCatalogCard({ club, joinPending, onJoin }: { club: ClubCatalogItem; joinPending: boolean; onJoin: () => void }) {
+  const statusLabel = club.status === "APPROVED" ? "clubStatusApproved" : club.status === "PENDING" ? "clubStatusPending" : "clubStatusRejected";
+  return <Card className="h-full"><CardHeader><div className="flex items-start justify-between gap-3"><CardTitle>{club.title}</CardTitle><Badge variant="outline">{t(statusLabel)}</Badge></div><p className="text-sm leading-6 text-muted-foreground">{club.description}</p></CardHeader><CardContent className="space-y-4"><div className="flex flex-wrap gap-2">{club.skills.map((skill) => <Badge key={skill} variant="secondary">{skill}</Badge>)}</div><div className="space-y-1 text-sm text-muted-foreground"><p className="flex items-center gap-2"><UsersRound aria-hidden="true" className="size-4" />{club.memberCount} {t("clubMembers")}</p>{club.location ? <p className="flex items-center gap-2"><MapPin aria-hidden="true" className="size-4" />{club.location}</p> : null}<p>{t("clubOwner")}: {club.creatorName}</p></div>{club.membershipRole ? <p className="text-sm font-medium text-primary">{club.membershipRole === "OWNER" ? t("clubOwner") : t("clubJoined")}</p> : club.mayJoin ? <Button className="w-full" disabled={joinPending} onClick={onJoin}>{t("joinClub")}</Button> : <p className="text-sm text-muted-foreground">{club.status === "PENDING" ? t("clubPending") : t("clubRejected")}</p>}</CardContent></Card>;
 }

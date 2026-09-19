@@ -12,6 +12,7 @@ import {
   createClub,
   joinClub,
   getRecommendations,
+  getClubs,
   requestEndorsement,
   updateCareerProfile,
   updateRecommendation,
@@ -56,6 +57,14 @@ export function useUpdateCareerProfile() {
       ),
   );
 }
+export function useClubCatalog() {
+  const context = useQueryContext("STUDENT");
+  return useQuery({
+    queryKey: queryKeys.opportunities.clubs(context.userId),
+    queryFn: ({ signal }) => getClubs(signal),
+    enabled: context.enabled,
+  });
+}
 export function useCreateClub() {
   return useRoleMutation(
     "STUDENT",
@@ -63,6 +72,7 @@ export function useCreateClub() {
     (_data, _input, userId) => [
       queryKeys.opportunities.dashboard(userId),
       queryKeys.opportunities.recommendations(userId),
+      queryKeys.opportunities.clubs(userId),
     ],
   );
 }
@@ -73,6 +83,7 @@ export function useJoinClub() {
     (_data, _input, userId) => [
       queryKeys.opportunities.dashboard(userId),
       queryKeys.opportunities.recommendations(userId),
+      queryKeys.opportunities.clubs(userId),
     ],
   );
 }

@@ -105,6 +105,19 @@ export const clubJoinSchema = z.object({
   role: z.enum(["OWNER", "MEMBER"]),
   joinedAt: z.string().datetime(),
 });
+export const clubCatalogItemSchema = z.object({
+  id: idSchema,
+  title: z.string(),
+  description: z.string(),
+  skills: z.array(z.string()),
+  location: z.string().nullable(),
+  status: z.enum(["PENDING", "APPROVED", "REJECTED"]),
+  creatorName: z.string(),
+  memberCount: z.number().int().nonnegative(),
+  membershipRole: z.enum(["OWNER", "MEMBER"]).nullable(),
+  mayJoin: z.boolean(),
+  submittedAt: z.string().datetime(),
+});
 export const recommendationSchema = z.object({
   id: idSchema,
   studentId: idSchema,
@@ -140,3 +153,4 @@ export const recommendationsResponseSchema = dtoEnvelope(
 export const recommendationResponseSchema = dtoEnvelope(recommendationSchema);
 export const clubResponseSchema = dtoEnvelope(clubSchema);
 export const clubJoinResponseSchema = dtoEnvelope(clubJoinSchema);
+export const clubsResponseSchema = dtoEnvelope(z.array(clubCatalogItemSchema));

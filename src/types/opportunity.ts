@@ -106,3 +106,16 @@ export interface ClubRecord {
   decidedAt: string | null;
   memberCount: number;
 }
+export interface ClubCatalogItem {
+  id: string;
+  title: string;
+  description: string;
+  skills: string[];
+  location: string | null;
+  status: ClubStatus;
+  creatorName: string;
+  memberCount: number;
+  membershipRole: "OWNER" | "MEMBER" | null;
+  mayJoin: boolean;
+  submittedAt: string;
+}

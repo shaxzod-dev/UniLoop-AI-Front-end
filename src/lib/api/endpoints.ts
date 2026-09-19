@@ -169,6 +169,7 @@ export const endpoints = {
   careerProfile: () =>
     endpoint("careerProfile", "PATCH", "/students/me/career-profile"),
   createClub: () => endpoint("createClub", "POST", "/students/me/clubs"),
+  clubs: () => endpoint("clubs", "GET", "/students/me/clubs"),
   joinClub: (clubId: string) =>
     endpoint("joinClub", "POST", `/students/me/clubs/${segment(clubId)}/join`, {
       clubId,

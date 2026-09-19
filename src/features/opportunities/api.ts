@@ -7,6 +7,7 @@ import {
 import {
   opportunityResponseSchema,
   clubJoinResponseSchema,
+  clubsResponseSchema,
   clubResponseSchema,
   profileResponseSchema,
   recommendationsResponseSchema,
@@ -18,6 +19,7 @@ import type {
   CareerProfileUpdate,
   RecommendationUpdate,
   ClubInput,
+  ClubCatalogItem,
 } from "@/types/opportunity";
 import type { EndorsementRequestInput } from "@/types/endorsement";
 import { getApiClient, type ApiClient } from "@/lib/api/client";
@@ -59,6 +61,13 @@ export function createClub(
   return client.request(
     { endpoint: endpoints.createClub(), role: "STUDENT", body: input },
     clubResponseSchema,
+    (dto) => dto.data,
+  );
+}
+export function getClubs(signal?: AbortSignal, client: ApiClient = getApiClient()): Promise<ClubCatalogItem[]> {
+  return client.request(
+    { endpoint: endpoints.clubs(), role: "STUDENT", signal },
+    clubsResponseSchema,
     (dto) => dto.data,
   );
 }

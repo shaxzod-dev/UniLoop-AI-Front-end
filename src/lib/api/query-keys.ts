@@ -62,6 +62,7 @@ export const queryKeys = {
       ["opportunities", studentId, "dashboard"] as const,
     recommendations: (studentId: string) =>
       ["opportunities", studentId, "recommendations"] as const,
+    clubs: (studentId: string) => ["opportunities", studentId, "clubs"] as const,
   },
   referrals: {
     candidates: (professorId: string) =>
