@@ -72,4 +72,7 @@ export const queryKeys = {
     byRole: (role: UserRole, userId: string) =>
       ["surveys", role, userId] as const,
   },
+  feedback: {
+    mine: (userId: string) => ["feedback", userId] as const,
+  },
 };

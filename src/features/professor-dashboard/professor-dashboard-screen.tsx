@@ -16,10 +16,11 @@ import {
 } from "@/features/courses/queries";
 import { useClassInsight } from "@/features/class-insights/queries";
 import { useInterventions } from "@/features/interventions/queries";
-import { getDemoUser } from "@/features/auth/demo-users";
+import { useAuthStore } from "@/features/auth/store";
 import { t } from "@/i18n";
 
 export function ProfessorDashboardScreen() {
+  const user = useAuthStore((state) => state.user);
   const dashboard = useProfessorDashboard();
   const courses = useCourses("PROFESSOR");
   const courseId = dashboard.data?.courseIds[0] ?? courses.data?.[0]?.id ?? "";
@@ -86,7 +87,7 @@ export function ProfessorDashboardScreen() {
           {t("professorOverview")}
         </p>
         <h1 className="mt-1 font-heading text-3xl font-semibold">
-          {t("welcome")}, {getDemoUser("PROFESSOR").fullName}
+          {t("welcome")}, {user?.fullName}
         </h1>
         <p className="mt-2 text-sm text-muted-foreground">
           {t("professorWelcomeSummary")}

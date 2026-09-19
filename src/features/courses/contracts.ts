@@ -35,9 +35,21 @@ const enrollmentStatusSchema = z.enum([
   "REJECTED",
   "ENROLLED",
 ]);
+const courseFitSchema = z.object({
+  matchPercentage: z.number().min(0).max(100),
+  recommended: z.boolean(),
+  prerequisitesMet: z.boolean(),
+  unmetPrerequisites: z.array(z.string()),
+  factors: z.array(z.string()),
+  profileSummary: z.object({ targetRole: z.string().nullable(), interests: z.array(z.string()), coreSkills: z.array(z.string()), verifiedSkills: z.array(z.string()) }),
+  assistantSummary: z.string(),
+  scoreMethod: z.string(),
+});
 export const courseCatalogItemSchema = courseSummaryDtoSchema.extend({
   description: z.string(),
   professorName: z.string(),
+  status: z.enum(["DRAFT", "PUBLISHED", "ARCHIVED"]),
+  availableForEnrollment: z.boolean(),
   enrollmentStatus: enrollmentStatusSchema,
   enrollmentRequestId: idSchema.nullable(),
   requestedAt: timestampSchema.nullable(),
@@ -56,6 +68,7 @@ export const enrollmentRequestSchema = z.object({
   requestedAt: timestampSchema,
   decidedAt: timestampSchema.nullable(),
   decisionNote: z.string().nullable(),
+  courseFit: courseFitSchema,
 });
 export const courseDetailDtoSchema = courseSummaryDtoSchema.extend({
   description: z.string(),
@@ -104,6 +117,7 @@ export const enrollmentRequestResponseSchema = dtoEnvelope(
     faculty: true,
     major: true,
     studyYear: true,
+    courseFit: true,
   }).extend({ status: enrollmentStatusSchema }),
 );
 export const courseResponseSchema = dtoEnvelope(courseDetailDtoSchema);

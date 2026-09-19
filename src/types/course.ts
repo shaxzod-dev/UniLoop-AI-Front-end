@@ -44,6 +44,8 @@ export type EnrollmentStatus =
 export interface CourseCatalogItem extends CourseSummary {
   description: string;
   professorName: string;
+  status: "DRAFT" | "PUBLISHED" | "ARCHIVED";
+  availableForEnrollment: boolean;
   enrollmentStatus: EnrollmentStatus;
   enrollmentRequestId: string | null;
   requestedAt: string | null;
@@ -62,6 +64,16 @@ export interface EnrollmentRequest {
   requestedAt: string;
   decidedAt: string | null;
   decisionNote: string | null;
+  courseFit: {
+    matchPercentage: number;
+    recommended: boolean;
+    prerequisitesMet: boolean;
+    unmetPrerequisites: string[];
+    factors: string[];
+    profileSummary: { targetRole: string | null; interests: string[]; coreSkills: string[]; verifiedSkills: string[] };
+    assistantSummary: string;
+    scoreMethod: string;
+  };
 }
 export interface CourseDetail extends CourseSummary {
   description: string;

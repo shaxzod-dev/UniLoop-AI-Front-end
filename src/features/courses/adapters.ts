@@ -31,6 +31,8 @@ export function adaptCourseCatalogItem(
     ...adaptCourseSummary(dto),
     description: dto.description,
     professorName: dto.professorName,
+    status: dto.status,
+    availableForEnrollment: dto.availableForEnrollment,
     enrollmentStatus: dto.enrollmentStatus,
     enrollmentRequestId: dto.enrollmentRequestId,
     requestedAt: dto.requestedAt,

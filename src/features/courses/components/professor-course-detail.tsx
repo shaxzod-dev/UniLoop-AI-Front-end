@@ -203,6 +203,21 @@ export function ProfessorCourseDetail({ courseId }: { courseId: string }) {
                   </p>
                 </CardHeader>
                 <CardContent>
+                  <div className="mb-4 rounded-md border border-primary/20 bg-primary/5 p-3 text-sm">
+                    <div className="flex items-center justify-between gap-2">
+                      <strong>AI moslik tahlili</strong>
+                      <Badge variant={request.courseFit.recommended ? "default" : "secondary"}>
+                        {request.courseFit.matchPercentage}%
+                      </Badge>
+                    </div>
+                    <p className="mt-2 text-muted-foreground">{request.courseFit.assistantSummary}</p>
+                    <p className="mt-2 text-xs text-muted-foreground">
+                      Maqsadli yo‘nalish: {request.courseFit.profileSummary.targetRole ?? "ko‘rsatilmagan"}
+                    </p>
+                    {request.courseFit.unmetPrerequisites.length ? (
+                      <p className="mt-1 text-xs text-destructive">Yetishmaydigan prerequisite: {request.courseFit.unmetPrerequisites.join(", ")}</p>
+                    ) : null}
+                  </div>
                   <div className="flex flex-wrap gap-2">
                     <Button
                       disabled={decideEnrollment.isPending}

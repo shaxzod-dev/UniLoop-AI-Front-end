@@ -2,6 +2,7 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { z } from "zod";
 import { login } from "@/features/auth/api";
@@ -20,6 +21,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import Link from "next/link";
 function BackendLogin() {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const form = useForm<z.output<typeof loginInputSchema>>({
     resolver: zodResolver(loginInputSchema),
     defaultValues: { email: "", password: "" },
@@ -27,6 +29,7 @@ function BackendLogin() {
   const mutation = useMutation({
     mutationFn: (input: z.output<typeof loginInputSchema>) => login(input),
     onSuccess: (data) => {
+      queryClient.clear();
       useAuthStore.getState().setSession(data.accessToken, data.user);
       router.replace(data.user.onboardingCompleted ? getDashboardPath(data.user.role) : "/onboarding");
     },
