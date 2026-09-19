@@ -17,6 +17,8 @@ import {
 } from "@/lib/mocks/read-models";
 import { validateInput } from "@/lib/mocks/validation";
 import type { EndorsementRequest } from "@/types/endorsement";
+import { clubInputSchema } from "@/features/opportunities/contracts";
+import type { Opportunity } from "@/types/opportunity";
 
 export function careerMutation(
   db: MockDatabase,
@@ -26,6 +28,37 @@ export function careerMutation(
 ): unknown {
   const { endpoint, body } = request;
   switch (endpoint.name) {
+    case "createClub": {
+      const input = validateInput(clubInputSchema, body);
+      const mutation = nextMutation(db);
+      const clubId = `club-${mutation.revision}`;
+      db.clubs.push({
+        id: clubId,
+        title: input.title,
+        description: input.description,
+        topic: input.topic,
+        skills: input.skills ?? [],
+        creatorId: studentId,
+        creatorName: db.students.find((item) => item.id === studentId)?.fullName ?? studentId,
+        status: "PENDING",
+        submittedAt: mutation.recordedAt,
+        decidedAt: null,
+        memberCount: 0,
+      });
+      const opportunity: Opportunity = {
+        id: clubId,
+        type: "CLUB",
+        title: input.title,
+        description: input.description,
+        targetRoleIds: ["role-junior-software-developer"],
+        skillIds: input.skills ?? [],
+        gapSkillIds: [],
+        collaborative: true,
+        relatedUserId: null,
+      };
+      db.opportunities.push(opportunity);
+      return { data: { id: clubId, title: input.title, topic: input.topic, requiredSkills: input.skills ?? [] } };
+    }
     case "careerProfile": {
       const input = validateInput(careerProfileInputSchema, body);
       const profile = required(

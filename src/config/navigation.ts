@@ -1,4 +1,4 @@
-import { BookOpenCheck, ClipboardList, Compass, LayoutDashboard, ListChecks, type LucideIcon, Send, UsersRound } from "lucide-react";
+import { BookOpenCheck, ClipboardList, Compass, LayoutDashboard, ListChecks, Presentation, ShieldCheck, type LucideIcon, Send, UsersRound } from "lucide-react";
 
 import type { UserRole } from "@/features/auth/types";
 import type { TranslationKey } from "@/i18n";
@@ -22,5 +22,11 @@ export const roleNavigation = {
     { href: "/professor/referrals", label: "navReferrals", icon: Send },
     { href: "/professor/growth-plan", label: "navLearningPlan", icon: ListChecks },
     { href: "/professor/surveys", label: "navSurveys", icon: UsersRound },
+  ],
+  ADMIN: [
+    { href: "/admin/dashboard", label: "navDashboard", icon: LayoutDashboard },
+    { href: "/admin/students", label: "navStudents", icon: UsersRound },
+    { href: "/admin/professors", label: "navProfessors", icon: Presentation },
+    { href: "/admin/clubs", label: "navClubRequests", icon: ShieldCheck },
   ],
 } as const satisfies Record<UserRole, readonly NavigationItem[]>;

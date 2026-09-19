@@ -32,6 +32,7 @@ import type {
   RecommendationStatus,
 } from "@/types/opportunity";
 import type { Survey } from "@/types/survey";
+import type { ClubRecord } from "@/types/opportunity";
 import type {
   Faculty,
   ProfessorSummary,
@@ -59,6 +60,7 @@ export interface MockDatabase {
   recommendationStatuses: Record<string, RecommendationStatus>;
   endorsements: EndorsementRequest[];
   surveys: Survey[];
+  clubs: ClubRecord[];
 }
 export function createMockDatabase(): MockDatabase {
   const submissions: SubmissionResult[] = students.map(
@@ -232,6 +234,21 @@ export function createMockDatabase(): MockDatabase {
       evidenceAssessmentIds: [diagnostic.id],
       status: "SUGGESTED",
     }));
+  const clubs: ClubRecord[] = opportunities
+    .filter((item) => item.type === "CLUB")
+    .map((item) => ({
+      id: item.id,
+      title: item.title,
+      description: item.description,
+      topic: item.title,
+      skills: item.skillIds,
+      creatorId: null,
+      creatorName: "Universitet hamjamiyati",
+      status: "APPROVED",
+      submittedAt: seedTimestamp,
+      decidedAt: seedTimestamp,
+      memberCount: 0,
+    }));
   return structuredClone({
     revision: 0,
     universities: [university],
@@ -265,6 +282,7 @@ export function createMockDatabase(): MockDatabase {
       { ...initialEndorsement, history: [...initialEndorsement.history] },
     ],
     surveys,
+    clubs,
   });
 }
 export function nextMutation(db: MockDatabase): {

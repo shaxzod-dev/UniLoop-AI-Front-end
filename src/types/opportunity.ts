@@ -92,3 +92,17 @@ export interface ClubInput {
   topic: string;
   skills?: string[];
 }
+export type ClubStatus = "PENDING" | "APPROVED" | "REJECTED";
+export interface ClubRecord {
+  id: string;
+  title: string;
+  description: string;
+  topic: string;
+  skills: string[];
+  creatorId: string | null;
+  creatorName: string;
+  status: ClubStatus;
+  submittedAt: string;
+  decidedAt: string | null;
+  memberCount: number;
+}

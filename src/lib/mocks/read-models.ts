@@ -79,14 +79,16 @@ export function getRecommendations(
   return db.opportunities
     .filter(
       (item) =>
-        item.type !== "PEER" ||
-        (profile.consent.peerRecommendations &&
-          db.profiles.some(
-            (peer) =>
-              peer.studentId === item.relatedUserId &&
-              peer.consent.discoverable &&
-              peer.consent.peerRecommendations,
-          )),
+        (item.type !== "CLUB" ||
+          db.clubs.find((club) => club.id === item.id)?.status === "APPROVED") &&
+        (item.type !== "PEER" ||
+          (profile.consent.peerRecommendations &&
+            db.profiles.some(
+              (peer) =>
+                peer.studentId === item.relatedUserId &&
+                peer.consent.discoverable &&
+                peer.consent.peerRecommendations,
+            ))),
     )
     .map((opportunity) => {
       const id = `recommendation-${opportunity.id}`;

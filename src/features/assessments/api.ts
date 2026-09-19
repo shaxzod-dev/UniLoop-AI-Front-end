@@ -16,8 +16,9 @@ export function getAssessment(
   client: ApiClient = getApiClient(),
   role: UserRole = "STUDENT",
 ) {
+  const endpointRole = role === "PROFESSOR" ? role : "STUDENT";
   return client.request(
-    { endpoint: endpoints.assessment(assessmentId, role), role, signal },
+    { endpoint: endpoints.assessment(assessmentId, endpointRole), role, signal },
     assessmentResponseSchema,
     (dto) => adaptAssessment(dto.data),
   );
