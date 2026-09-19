@@ -75,4 +75,7 @@ export const queryKeys = {
   feedback: {
     mine: (userId: string) => ["feedback", userId] as const,
   },
+  admin: {
+    overview: (adminId: string) => ["admin", adminId, "overview"] as const,
+  },
 };

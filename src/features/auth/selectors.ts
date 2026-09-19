@@ -10,5 +10,7 @@ export function selectDemoSession(role: UserRole | null): AuthSession | null {
 }
 
 export function getDashboardPath(role: UserRole): string {
-  return role === "STUDENT" ? "/student/dashboard" : "/professor/dashboard";
+  if (role === "STUDENT") return "/student/dashboard";
+  if (role === "PROFESSOR") return "/professor/dashboard";
+  return "/admin/dashboard";
 }

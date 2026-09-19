@@ -4,7 +4,7 @@ import { idSchema } from "@/lib/api/schemas";
 import type { TransportRequest } from "@/lib/api/transport";
 import { academicMutation } from "@/lib/mocks/academic-mutations";
 import { careerMutation } from "@/lib/mocks/career-mutations";
-import type { MockDatabase } from "@/lib/mocks/database";
+import { nextMutation, type MockDatabase } from "@/lib/mocks/database";
 import {
   getInsight,
   getOpportunityDashboard,
@@ -19,6 +19,8 @@ import {
   courseSummaryDto,
 } from "@/lib/mocks/serializers";
 import { validateInput } from "@/lib/mocks/validation";
+import { clubDecisionInputSchema } from "@/features/admin/contracts";
+import type { ClubDecision } from "@/types/admin";
 
 const professorEndpoints = new Set([
   "professorDashboard",
@@ -35,13 +37,17 @@ const professorEndpoints = new Set([
   "studentEvidence",
   "decideEndorsement",
 ]);
+const adminEndpoints = new Set(["adminOverview", "decideClub"]);
 export function handleMockRequest(
   db: MockDatabase,
   request: TransportRequest,
 ): unknown {
   const { endpoint, role, query } = request;
   if (!role) throw new ApiError("UNAUTHORIZED", 401, "apiUnauthorized");
+  if (adminEndpoints.has(endpoint.name) && role !== "ADMIN")
+    throw new ApiError("FORBIDDEN", 403, "apiForbidden");
   if (
+    !adminEndpoints.has(endpoint.name) &&
     endpoint.name !== "courseDetail" &&
     endpoint.name !== "surveys" &&
     (professorEndpoints.has(endpoint.name)
@@ -53,12 +59,40 @@ export function handleMockRequest(
     validateInput(idSchema, parameter);
   const studentId = demoUsers.STUDENT.id;
   const professorId = demoUsers.PROFESSOR.id;
+  if (endpoint.name === "adminOverview") {
+    const clubs = db.clubs;
+    return {
+      data: {
+        students: db.students,
+        professors: db.professors,
+        clubs,
+        stats: {
+          totalStudents: db.students.length,
+          totalProfessors: db.professors.length,
+          pendingClubs: clubs.filter((item) => item.status === "PENDING").length,
+          approvedClubs: clubs.filter((item) => item.status === "APPROVED").length,
+          rejectedClubs: clubs.filter((item) => item.status === "REJECTED").length,
+        },
+      },
+    };
+  }
+  if (endpoint.name === "decideClub") {
+    const input = validateInput(clubDecisionInputSchema, request.body) as { status: ClubDecision };
+    const club = required(db.clubs, (item) => item.id === endpoint.params.clubId);
+    if (club.status !== "PENDING")
+      throw new ApiError("CONFLICT", 409, "apiConflict");
+    club.status = input.status;
+    club.decidedAt = new Date().toISOString();
+    nextMutation(db);
+    return { data: club };
+  }
   if (endpoint.method !== "GET") {
     return [
       "careerProfile",
       "updateRecommendation",
       "requestEndorsement",
       "decideEndorsement",
+      "createClub",
     ].includes(endpoint.name)
       ? careerMutation(db, request, studentId, professorId)
       : academicMutation(db, request, studentId, professorId);

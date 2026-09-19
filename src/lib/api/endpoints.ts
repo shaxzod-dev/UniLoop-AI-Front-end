@@ -12,6 +12,14 @@ export const endpoints = {
   register: () => endpoint("register", "POST", "/auth/register"),
   login: () => endpoint("login", "POST", "/auth/login"),
   identity: () => endpoint("identity", "GET", "/auth/me"),
+  adminOverview: () => endpoint("adminOverview", "GET", "/admin/overview"),
+  decideClub: (clubId: string) =>
+    endpoint(
+      "decideClub",
+      "PATCH",
+      `/admin/clubs/${segment(clubId)}`,
+      { clubId },
+    ),
   onboarding: () => endpoint("onboarding", "POST", "/auth/onboarding"),
   studentDashboard: () =>
     endpoint("studentDashboard", "GET", "/students/me/dashboard"),

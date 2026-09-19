@@ -7,4 +7,5 @@ export const surveyAudiencePresentation: Record<
 > = {
   STUDENT: { label: "surveyAudienceStudent" },
   PROFESSOR: { label: "surveyAudienceProfessor" },
+  ADMIN: { label: "roleAdmin" },
 };

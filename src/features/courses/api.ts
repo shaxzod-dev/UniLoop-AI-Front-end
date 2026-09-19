@@ -151,8 +151,9 @@ export function getCourse(
   signal?: AbortSignal,
   client: ApiClient = getApiClient(),
 ) {
+  const endpointRole = role === "PROFESSOR" ? role : "STUDENT";
   return client.request(
-    { endpoint: endpoints.courseDetail(courseId, role), role, signal },
+    { endpoint: endpoints.courseDetail(courseId, endpointRole), role, signal },
     courseResponseSchema,
     (dto) => adaptCourseDetail(dto.data),
   );

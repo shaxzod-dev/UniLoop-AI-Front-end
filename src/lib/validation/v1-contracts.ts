@@ -50,6 +50,7 @@ export async function validateV1Contracts(): Promise<void> {
     university: "",
     faculty: "",
     avatarLabel: "DK",
+    onboardingCompleted: true,
   });
   ensure(
     identity.id !== identity.profileId,
@@ -62,8 +63,8 @@ export async function validateV1Contracts(): Promise<void> {
     facultyId: null,
   });
   ensure(
-    !authenticatedUserSchema.safeParse({ ...identity, role: "ADMIN" }).success,
-    "Unsupported public identity role rejected",
+    authenticatedUserSchema.safeParse({ ...identity, role: "ADMIN" }).success,
+    "Admin identity role is supported",
   );
   const safe = {
     id: "assessment-diagnostic",

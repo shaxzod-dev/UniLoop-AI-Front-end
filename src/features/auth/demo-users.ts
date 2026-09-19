@@ -17,6 +17,14 @@ export const demoUsers = {
     faculty: "Axborot texnologiyalari kafedrasi",
     avatarLabel: "AR",
   },
+  ADMIN: {
+    id: "admin-uniloop",
+    fullName: "UniLoop administratori",
+    role: "ADMIN",
+    university: "Samarqand davlat universiteti",
+    faculty: "Universitet boshqaruvi",
+    avatarLabel: "UA",
+  },
 } as const satisfies Record<UserRole, AuthUser>;
 
 export function getDemoUser(role: UserRole): AuthUser {

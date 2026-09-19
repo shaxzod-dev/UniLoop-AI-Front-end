@@ -52,7 +52,7 @@ export const useAuthStore = create<AuthState>()(
             ...current,
             role:
               "role" in persisted &&
-              (persisted.role === "STUDENT" || persisted.role === "PROFESSOR")
+              (persisted.role === "STUDENT" || persisted.role === "PROFESSOR" || persisted.role === "ADMIN")
                 ? persisted.role
                 : null,
           };

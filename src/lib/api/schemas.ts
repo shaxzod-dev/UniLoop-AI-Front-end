@@ -6,7 +6,7 @@ export const idSchema = z
   .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/);
 export const percentageSchema = z.number().min(0).max(100);
 export const timestampSchema = z.string().datetime();
-export const roleSchema = z.enum(["STUDENT", "PROFESSOR"]);
+export const roleSchema = z.enum(["STUDENT", "PROFESSOR", "ADMIN"]);
 export const evidenceSchema = z.object({
   id: idSchema,
   type: z.enum(["ASSESSMENT", "PROJECT", "PROFESSOR_VERIFICATION"]),
