@@ -65,10 +65,33 @@ export const uz = {
   navClubsProjects: "Klublar va loyihalar",
   navCreateCourse: "Kurs yaratish",
   navSettings: "Sozlamalar",
-  progressIntro: "Akademik dalillar va kasbiy tayyorgarlik bir joyda hisoblanadi.",
+  settingsTitle: "Sozlamalar",
+  settingsDescription:
+    "Joriy hisob, sessiya va real demo rejimi haqida ma’lumot.",
+  settingsAccount: "Hisob ma’lumotlari",
+  settingsSession: "Sessiya holati",
+  settingsName: "Foydalanuvchi",
+  settingsRole: "Rol",
+  settingsProfileId: "Profil identifikatori",
+  settingsMode: "Ishlash rejimi",
+  settingsMockMode: "Mock rejim",
+  settingsRealMode: "Real backend rejimi",
+  settingsTokenActive: "Sessiya tokeni faol.",
+  settingsTokenMissing: "Sessiya tokeni topilmadi.",
+  settingsSessionNote:
+    "Chiqish tugmasi yuqori foydalanuvchi menyusida joylashgan. Maxfiylik va rozilik sozlamalari tegishli bo‘limlarda boshqariladi.",
+  assessmentsIndexDescription:
+    "Baholashlar kurslar ichida boshqariladi. Quyida har bir kursingizdagi mavjud baholashlarga tezkor havolalar berilgan.",
+  learningPlanIndexIntro:
+    "O‘quv rejasi kursga bog‘langan. Kerakli kursni tanlab, uning shaxsiy rivojlanish rejasini ko‘ring.",
+  learningPlanIndexDescription:
+    "Ushbu kurs bo‘yicha rivojlanish rejasi va keyingi o‘quv qadamlarini oching.",
+  progressIntro:
+    "Akademik dalillar va kasbiy tayyorgarlik bir joyda hisoblanadi.",
   academicProgress: "Akademik rivojlanish",
   careerReadiness: "Kasbiy tayyorgarlik",
-  progressNoEvidence: "Hali baholash dalillari yo‘q. Dastlabki baholashni yakunlang.",
+  progressNoEvidence:
+    "Hali baholash dalillari yo‘q. Dastlabki baholashni yakunlang.",
   outcomeEvidence: "Learning outcome dalillari",
   navAssessments: "Baholashlar",
   navKnowledgeMap: "Bilim xaritasi",
@@ -176,15 +199,18 @@ export const uz = {
   createCourse: "Yangi fan yaratish",
   courseTitle: "Fan nomi",
   courseCode: "Fan kodi",
-  createCourseHint: "Yaratilgandan keyin talabalar ushbu fanga qo'shilish so'rovini yuborishi mumkin.",
+  createCourseHint:
+    "Yaratilgandan keyin talabalar ushbu fanga qo'shilish so'rovini yuborishi mumkin.",
   createClub: "Klub yaratish",
   clubName: "Klub nomi",
   clubTopic: "Mavzu yoki yo'nalish",
   clubDescription: "Qisqacha tavsif",
-  createClubHint: "So‘rov administratorga yuboriladi. Klub faqat tasdiqlangandan keyin talabalarga ko‘rinadi.",
+  createClubHint:
+    "So‘rov administratorga yuboriladi. Klub faqat tasdiqlangandan keyin talabalarga ko‘rinadi.",
   joinClub: "Klubga qo'shilish",
   clubJoined: "Siz ushbu klub a'zosisiz.",
-  clubCreated: "Klub so‘rov sifatida yuborildi va administrator tasdig‘ini kutmoqda.",
+  clubCreated:
+    "Klub so‘rov sifatida yuborildi va administrator tasdig‘ini kutmoqda.",
   profileReady: "Kasbiy profilingiz tayyor",
   profileReadyDescription:
     "AI profilingiz asosida rivojlanish yo'nalishini tuzdi. Imkoniyatlar va tavsiyalarni ko'rishingiz mumkin.",
@@ -525,10 +551,14 @@ export const uz = {
   surveyErrorTitle: "So‘rovnomalarni yuklab bo‘lmadi",
   surveyAudienceLabel: "Maqsadli auditoriya",
   adminOverviewTitle: "Universitet boshqaruvi",
-  adminOverviewDescription: "Talabalar, professorlar va klub so‘rovlarini bir joydan boshqaring.",
-  adminStudentsDescription: "Universitetdagi barcha talabalar va ularning mavjud ma’lumotlari.",
-  adminProfessorsDescription: "Universitetdagi barcha professor-o‘qituvchilar ro‘yxati.",
-  adminClubsDescription: "Yangi klublarni tekshiring va ularni universitet hamjamiyatiga oching yoki rad eting.",
+  adminOverviewDescription:
+    "Talabalar, professorlar va klub so‘rovlarini bir joydan boshqaring.",
+  adminStudentsDescription:
+    "Universitetdagi barcha talabalar va ularning mavjud ma’lumotlari.",
+  adminProfessorsDescription:
+    "Universitetdagi barcha professor-o‘qituvchilar ro‘yxati.",
+  adminClubsDescription:
+    "Yangi klublarni tekshiring va ularni universitet hamjamiyatiga oching yoki rad eting.",
   adminTotalStudents: "Jami talabalar",
   adminTotalProfessors: "Jami professorlar",
   adminPendingClubs: "Kutilayotgan klublar",
