@@ -15,7 +15,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { useCourse } from "@/features/courses/queries";
+import { useCourse, useCourses } from "@/features/courses/queries";
 import { useMastery } from "@/features/mastery/queries";
 import {
   formatMasteryPercentage,
@@ -24,15 +24,17 @@ import {
 import { t } from "@/i18n";
 
 export function StudentCourseDetail({ courseId }: { courseId: string }) {
-  const course = useCourse(courseId, "STUDENT");
-  const mastery = useMastery(courseId);
-  if (course.isLoading || mastery.isLoading)
+  const enrolled = useCourses("STUDENT");
+  const hasCourse = enrolled.data?.some((course) => course.id === courseId) === true;
+  const course = useCourse(courseId, "STUDENT", hasCourse);
+  const mastery = useMastery(courseId, hasCourse);
+  if (enrolled.isLoading || (hasCourse && (course.isLoading || mastery.isLoading)))
     return (
       <PageContainer className="py-8">
         <LoadingState cards={4} />
       </PageContainer>
     );
-  if (course.isError || mastery.isError)
+  if (enrolled.isError || !hasCourse || course.isError || mastery.isError)
     return (
       <PageContainer className="py-8">
         <ErrorState

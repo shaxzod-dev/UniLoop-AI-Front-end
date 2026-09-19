@@ -25,7 +25,9 @@ import {
 } from "@/features/opportunities/queries";
 import { t } from "@/i18n";
 
-export function OpportunityDashboardScreen() {
+type OpportunitySection = "profile" | "jobs" | "network" | "clubs" | "endorsements";
+
+export function OpportunityDashboardScreen({ section }: { section?: OpportunitySection }) {
   const dashboard = useOpportunityDashboard();
   const createClub = useCreateClub();
   const [clubName, setClubName] = useState("");
@@ -65,6 +67,7 @@ export function OpportunityDashboardScreen() {
   const orderedConnections = primary
     ? [primary, ...connections.filter((item) => item.id !== primary.id)]
     : connections;
+  const shows = (name: OpportunitySection) => !section || section === name;
   return (
     <PageContainer className="space-y-8 py-8 sm:py-10">
       <header>
@@ -78,14 +81,14 @@ export function OpportunityDashboardScreen() {
           {t("opportunityIntro")}
         </p>
       </header>
-      <section
+      {shows("profile") ? <section
         className="grid gap-4 lg:grid-cols-2"
         aria-label={t("careerProfile")}
       >
         <CareerProfileCard profile={profile} />
         <ReadinessPanel profile={profile} gaps={gaps} />
-      </section>
-      <section>
+      </section> : null}
+      {shows("clubs") ? <section>
         <Card className="max-w-3xl border-primary/20">
           <CardHeader>
             <CardTitle>{t("createClub")}</CardTitle>
@@ -147,21 +150,21 @@ export function OpportunityDashboardScreen() {
             />
           </CardContent>
         </Card>
-      </section>
-      <section className="space-y-4">
+      </section> : null}
+      {shows("profile") ? <section className="space-y-4">
         <h2 className="font-heading text-xl font-semibold">
           {t("skillEvidence")}
         </h2>
         <AcademicEvidenceLinks />
         <SkillEvidenceList skills={profile.skills} studentLinks />
-      </section>
-      <section className="space-y-3">
+      </section> : null}
+      {shows("profile") ? <section className="space-y-3">
         <h2 className="font-heading text-xl font-semibold">
           {t("projectEvidence")}
         </h2>
         <ProjectEvidenceList projects={projects} />
-      </section>
-      <section className="space-y-3">
+      </section> : null}
+      {shows("profile") ? <section className="space-y-3">
         <h2 className="font-heading text-xl font-semibold">
           {t("gapAnalysis")}
         </h2>
@@ -169,8 +172,8 @@ export function OpportunityDashboardScreen() {
           {t("gapIntro")}
         </p>
         <GapAnalysis gaps={gaps} />
-      </section>
-      <section className="space-y-4">
+      </section> : null}
+      {shows("network") ? <section className="space-y-4">
         <h2 className="font-heading text-xl font-semibold">
           {t("navRecommendedConnections")}
         </h2>
@@ -195,8 +198,8 @@ export function OpportunityDashboardScreen() {
         ) : (
           <ContextState title="emptyTitle" description="emptyDescription" />
         )}
-      </section>
-      <section className="space-y-4">
+      </section> : null}
+      {shows("jobs") ? <section className="space-y-4">
         <h2 className="font-heading text-xl font-semibold">
           {t("recommendedCareer")}
         </h2>
@@ -217,8 +220,8 @@ export function OpportunityDashboardScreen() {
         ) : (
           <ContextState title="emptyTitle" description="emptyDescription" />
         )}
-      </section>
-      <section
+      </section> : null}
+      {shows("endorsements") ? <section
         className="grid items-start gap-4 xl:grid-cols-2"
         aria-label={t("navProfessorEndorsement")}
       >
@@ -229,7 +232,7 @@ export function OpportunityDashboardScreen() {
           requests={endorsementRequests}
         />
         <ConsentControls consent={profile.consent} />
-      </section>
+      </section> : null}
     </PageContainer>
   );
 }

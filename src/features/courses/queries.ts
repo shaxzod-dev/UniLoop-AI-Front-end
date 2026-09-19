@@ -134,12 +134,12 @@ export function useDecideEnrollmentRequest(courseId: string) {
     ],
   );
 }
-export function useCourse(courseId: string, role: UserRole) {
+export function useCourse(courseId: string, role: UserRole, enabled = true) {
   const context = useQueryContext(role);
   return useQuery({
     queryKey: queryKeys.courses.detail(role, context.userId, courseId),
     queryFn: ({ signal }) => getCourse(courseId, role, signal),
-    enabled: context.enabled && !!courseId,
+    enabled: context.enabled && !!courseId && enabled,
   });
 }
 function courseMutationKeys(professorId: string, courseId: string) {

@@ -23,6 +23,7 @@ export const endpoints = {
   onboarding: () => endpoint("onboarding", "POST", "/auth/onboarding"),
   studentDashboard: () =>
     endpoint("studentDashboard", "GET", "/students/me/dashboard"),
+  studentProgress: () => endpoint("studentProgress", "GET", "/students/me/progress"),
   professorDashboard: () =>
     endpoint("professorDashboard", "GET", "/professors/me/dashboard"),
   studentCourses: () =>
