@@ -33,14 +33,15 @@ import type { ClubCatalogItem } from "@/types/opportunity";
 type OpportunitySection = "profile" | "jobs" | "network" | "clubs" | "endorsements";
 
 export function OpportunityDashboardScreen({ section }: { section?: OpportunitySection }) {
+  // The club catalogue is independent from career recommendations. Keeping it
+  // in a separate client subtree prevents a visit to /clubs from waiting for
+  // the recommendation dashboard and its profile-derived work.
+  if (section === "clubs") return <ClubsScreen />;
+  return <OpportunityDashboardContent section={section} />;
+}
+
+function OpportunityDashboardContent({ section }: { section?: OpportunitySection }) {
   const dashboard = useOpportunityDashboard();
-  const createClub = useCreateClub();
-  const clubs = useClubCatalog();
-  const joinClub = useJoinClub();
-  const [clubName, setClubName] = useState("");
-  const [clubTopic, setClubTopic] = useState("");
-  const [clubDescription, setClubDescription] = useState("");
-  const [clubSearch, setClubSearch] = useState("");
   if (dashboard.isLoading)
     return (
       <PageContainer className="py-8">
@@ -76,12 +77,6 @@ export function OpportunityDashboardScreen({ section }: { section?: OpportunityS
     ? [primary, ...connections.filter((item) => item.id !== primary.id)]
     : connections;
   const shows = (name: OpportunitySection) => !section || section === name;
-  const visibleClubs = (clubs.data ?? []).filter((club) =>
-    [club.title, club.description, club.creatorName, ...club.skills]
-      .join(" ")
-      .toLocaleLowerCase("uz")
-      .includes(clubSearch.trim().toLocaleLowerCase("uz")),
-  );
   return (
     <PageContainer className="space-y-8 py-8 sm:py-10">
       <header>
@@ -102,83 +97,7 @@ export function OpportunityDashboardScreen({ section }: { section?: OpportunityS
         <CareerProfileCard profile={profile} />
         <ReadinessPanel profile={profile} gaps={gaps} />
       </section> : null}
-      {shows("clubs") ? <section>
-        <Card className="max-w-3xl border-primary/20">
-          <CardHeader>
-            <CardTitle>{t("createClub")}</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <form
-              className="grid gap-3 md:grid-cols-2"
-              onSubmit={(event) => {
-                event.preventDefault();
-                if (!clubName.trim() || !clubTopic.trim() || !clubDescription.trim())
-                  return;
-                createClub.mutate(
-                  {
-                    title: clubName,
-                    topic: clubTopic,
-                    description: clubDescription,
-                  },
-                  {
-                    onSuccess: () => {
-                      setClubName("");
-                      setClubTopic("");
-                      setClubDescription("");
-                    },
-                  },
-                );
-              }}
-            >
-              <Input
-                aria-label={t("clubName")}
-                onChange={(event) => setClubName(event.target.value)}
-                placeholder={t("clubName")}
-                value={clubName}
-              />
-              <Input
-                aria-label={t("clubTopic")}
-                onChange={(event) => setClubTopic(event.target.value)}
-                placeholder={t("clubTopic")}
-                value={clubTopic}
-              />
-              <Input
-                aria-label={t("clubDescription")}
-                className="md:col-span-2"
-                onChange={(event) => setClubDescription(event.target.value)}
-                placeholder={t("clubDescription")}
-                value={clubDescription}
-              />
-              <Button disabled={createClub.isPending} type="submit">
-                {t("createClub")}
-              </Button>
-            </form>
-            <p className="mt-3 text-xs text-muted-foreground">
-              {t("createClubHint")}
-            </p>
-            <MutationFeedback
-              error={createClub.isError}
-              pending={createClub.isPending}
-              success={createClub.isSuccess}
-              successMessage="clubCreated"
-            />
-          </CardContent>
-        </Card>
-        <div className="mt-8 space-y-4">
-          <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-end">
-            <div>
-              <h2 className="font-heading text-xl font-semibold">{t("allClubs")}</h2>
-              <p className="mt-1 text-sm text-muted-foreground">{t("clubsCatalogDescription")}</p>
-            </div>
-            <div className="relative w-full sm:max-w-sm">
-              <Search aria-hidden="true" className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-              <Input aria-label={t("clubSearch")} className="pl-9" onChange={(event) => setClubSearch(event.target.value)} placeholder={t("clubSearch")} value={clubSearch} />
-            </div>
-          </div>
-          {clubs.isLoading ? <LoadingState cards={3} /> : clubs.isError ? <ErrorState retry={() => void clubs.refetch()} /> : visibleClubs.length ? <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">{visibleClubs.map((club) => <ClubCatalogCard club={club} joinPending={joinClub.isPending} key={club.id} onJoin={() => joinClub.mutate(club.id)} />)}</div> : <Card><CardContent className="pt-6 text-sm text-muted-foreground">{t("noClubsFound")}</CardContent></Card>}
-          <MutationFeedback error={joinClub.isError} pending={joinClub.isPending} success={joinClub.isSuccess} successMessage="clubJoined" />
-        </div>
-      </section> : null}
+      {shows("clubs") ? <ClubsArea /> : null}
       {shows("profile") ? <section className="space-y-4">
         <h2 className="font-heading text-xl font-semibold">
           {t("skillEvidence")}
@@ -262,6 +181,66 @@ export function OpportunityDashboardScreen({ section }: { section?: OpportunityS
         <ConsentControls consent={profile.consent} />
       </section> : null}
     </PageContainer>
+  );
+}
+
+function ClubsScreen() {
+  return (
+    <PageContainer className="space-y-8 py-8 sm:py-10">
+      <header>
+        <p className="text-sm font-medium text-primary">{t("homeLoopDevelopment")}</p>
+        <h1 className="mt-1 font-heading text-3xl font-semibold tracking-tight">{t("navOpportunities")}</h1>
+        <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">{t("opportunityIntro")}</p>
+      </header>
+      <ClubsArea />
+    </PageContainer>
+  );
+}
+
+function ClubsArea() {
+  const createClub = useCreateClub();
+  const clubs = useClubCatalog();
+  const joinClub = useJoinClub();
+  const [clubName, setClubName] = useState("");
+  const [clubTopic, setClubTopic] = useState("");
+  const [clubDescription, setClubDescription] = useState("");
+  const [clubSearch, setClubSearch] = useState("");
+  const visibleClubs = (clubs.data ?? []).filter((club) =>
+    [club.title, club.description, club.creatorName, ...club.skills]
+      .join(" ")
+      .toLocaleLowerCase("uz")
+      .includes(clubSearch.trim().toLocaleLowerCase("uz")),
+  );
+  return (
+    <section>
+      <Card className="max-w-3xl border-primary/20">
+        <CardHeader><CardTitle>{t("createClub")}</CardTitle></CardHeader>
+        <CardContent>
+          <form className="grid gap-3 md:grid-cols-2" onSubmit={(event) => {
+            event.preventDefault();
+            if (!clubName.trim() || !clubTopic.trim() || !clubDescription.trim()) return;
+            createClub.mutate({ title: clubName, topic: clubTopic, description: clubDescription }, {
+              onSuccess: () => { setClubName(""); setClubTopic(""); setClubDescription(""); },
+            });
+          }}>
+            <Input aria-label={t("clubName")} onChange={(event) => setClubName(event.target.value)} placeholder={t("clubName")} value={clubName} />
+            <Input aria-label={t("clubTopic")} onChange={(event) => setClubTopic(event.target.value)} placeholder={t("clubTopic")} value={clubTopic} />
+            <Input aria-label={t("clubDescription")} className="md:col-span-2" onChange={(event) => setClubDescription(event.target.value)} placeholder={t("clubDescription")} value={clubDescription} />
+            <Button disabled={createClub.isPending} type="submit">{t("createClub")}</Button>
+          </form>
+          <p className="mt-3 text-xs text-muted-foreground">{t("createClubHint")}</p>
+          <MutationFeedback error={createClub.isError} pending={createClub.isPending} success={createClub.isSuccess} successMessage="clubCreated" />
+        </CardContent>
+      </Card>
+      <div className="mt-8 space-y-4">
+        <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-end">
+          <div><h2 className="font-heading text-xl font-semibold">{t("allClubs")}</h2><p className="mt-1 text-sm text-muted-foreground">{t("clubsCatalogDescription")}</p></div>
+          <div className="relative w-full sm:max-w-sm"><Search aria-hidden="true" className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" /><Input aria-label={t("clubSearch")} className="pl-9" onChange={(event) => setClubSearch(event.target.value)} placeholder={t("clubSearch")} value={clubSearch} /></div>
+        </div>
+        {clubs.isLoading ? <LoadingState cards={3} /> : clubs.isError ? <ErrorState retry={() => void clubs.refetch()} /> : visibleClubs.length ? <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">{visibleClubs.map((club) => <ClubCatalogCard club={club} joinPending={joinClub.isPending} key={club.id} onJoin={() => joinClub.mutate(club.id)} />)}</div> : <Card><CardContent className="pt-6 text-sm text-muted-foreground">{t("noClubsFound")}</CardContent></Card>}
+        <MutationFeedback error={joinClub.isError} pending={joinClub.isPending} success={joinClub.isSuccess} successMessage="clubJoined" />
+      </div>
+    </section>
   );
 }
 

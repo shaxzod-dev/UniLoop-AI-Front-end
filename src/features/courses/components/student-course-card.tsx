@@ -22,8 +22,11 @@ import { t } from "@/i18n";
 import type { CourseSummary } from "@/types/course";
 
 export function StudentCourseCard({ course }: { course: CourseSummary }) {
-  const detail = useCourse(course.id, "STUDENT");
-  const mastery = useMastery(course.id);
+  // Course lists already contain summaries. The full course and mastery
+  // payloads are requested by the detail page after the student opens it.
+  // Keeping the hooks disabled here prevents two network requests per card.
+  const detail = useCourse(course.id, "STUDENT", false);
+  const mastery = useMastery(course.id, false);
   const current = mastery.data;
   const assessed = current?.outcomes.filter(
     (outcome) => outcome.evidence.length,

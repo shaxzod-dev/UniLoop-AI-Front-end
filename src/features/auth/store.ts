@@ -44,7 +44,7 @@ export const useAuthStore = create<AuthState>()(
       partialize: (state) =>
         env.useMocks
           ? { role: state.role }
-          : { accessToken: state.accessToken },
+          : { accessToken: state.accessToken, role: state.role, user: state.user },
       merge: (persisted: unknown, current) => {
         if (!persisted || typeof persisted !== "object") return current;
         if (env.useMocks)
@@ -56,21 +56,33 @@ export const useAuthStore = create<AuthState>()(
                 ? persisted.role
                 : null,
           };
+        const p = persisted as Record<string, unknown>;
+        const accessToken =
+          typeof p.accessToken === "string" && p.accessToken.length <= 8192
+            ? p.accessToken
+            : null;
+        const role =
+          typeof p.role === "string" &&
+          (p.role === "STUDENT" || p.role === "PROFESSOR" || p.role === "ADMIN")
+            ? p.role
+            : null;
+        const user = p.user && typeof p.user === "object" ? (p.user as any) : null;
         return {
           ...current,
-          accessToken:
-            "accessToken" in persisted &&
-            typeof persisted.accessToken === "string" &&
-            persisted.accessToken.length <= 8192
-              ? persisted.accessToken
-              : null,
+          accessToken,
+          role,
+          user,
         };
       },
       skipHydration: true,
       onRehydrateStorage: () => (state) => {
-        if (env.useMocks && state) {
-          if (state.role) state.loginAsRole(state.role);
-          state.setHydrated(true);
+        if (state) {
+          if (env.useMocks && state.role) {
+            state.loginAsRole(state.role);
+          }
+          if (state.accessToken && state.user && state.role) {
+            state.setHydrated(true);
+          }
         }
       },
     },

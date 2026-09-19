@@ -11,11 +11,13 @@ export function AuthHydrator() {
   const cache = useQueryClient();
   useEffect(() => {
     const unsubscribe = useAuthStore.subscribe((state, previous) => {
-      if (
-        state.user?.id !== previous.user?.id ||
-        state.accessToken !== previous.accessToken
-      )
+      const loggedOut = Boolean(previous.accessToken && !state.accessToken);
+      const switchedUser = Boolean(
+        previous.user?.id && state.user?.id && previous.user.id !== state.user.id,
+      );
+      if (loggedOut || switchedUser) {
         cache.clear();
+      }
     });
     async function hydrate() {
       await useAuthStore.persist.rehydrate();

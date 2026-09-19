@@ -54,8 +54,7 @@ export function StudentDashboardScreen() {
     courses.isError ||
     mastery.isError ||
     plan.isError ||
-    courseDetail.isError ||
-    opportunities.isError;
+    courseDetail.isError;
   if (isLoading)
     return (
       <PageContainer className="py-8">
@@ -72,7 +71,6 @@ export function StudentDashboardScreen() {
             void courseDetail.refetch();
             void mastery.refetch();
             void plan.refetch();
-            void opportunities.refetch();
           }}
         />
       </PageContainer>
@@ -135,9 +133,11 @@ export function StudentDashboardScreen() {
   const nextTasks = [...(plan.data?.tasks ?? [])]
     .sort((a, b) => a.order - b.order)
     .slice(0, 3);
-  const lowest = mastery.data?.outcomes.reduce((current, item) =>
-    item.percentage < current.percentage ? item : current,
-  );
+  const lowest = mastery.data?.outcomes.length
+    ? mastery.data.outcomes.reduce((current, item) =>
+        item.percentage < current.percentage ? item : current,
+      )
+    : undefined;
   const recentAssessment = courseDetail.data?.assessments.find(
     (item) => item.type === "DIAGNOSTIC",
   );

@@ -6,9 +6,10 @@ import {
   CheckCircle2,
   Circle,
   Clock,
+  Loader2,
   PlayCircle,
+  Sparkles,
 } from "lucide-react";
-import { EmptyState } from "@/components/feedback/empty-state";
 import { ErrorState } from "@/components/feedback/error-state";
 import { LoadingState } from "@/components/feedback/loading-state";
 import { PageContainer } from "@/components/shared/page-container";
@@ -16,7 +17,10 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useCourse } from "@/features/courses/queries";
-import { useLearningPlan } from "@/features/learning-plans/queries";
+import {
+  useLearningPlan,
+  useGenerateLearningPlan,
+} from "@/features/learning-plans/queries";
 import {
   taskStatusLabels,
   taskTypeLabels,
@@ -42,12 +46,15 @@ function isAvailableTarget(target: string): boolean {
 export function LearningPlanView({ courseId }: { courseId: string }) {
   const plan = useLearningPlan(courseId);
   const course = useCourse(courseId, "STUDENT");
+  const generatePlan = useGenerateLearningPlan(courseId);
+
   if (plan.isLoading || course.isLoading)
     return (
       <PageContainer className="py-8">
         <LoadingState cards={4} />
       </PageContainer>
     );
+
   if (plan.isError || course.isError)
     return (
       <PageContainer className="py-8">
@@ -60,28 +67,108 @@ export function LearningPlanView({ courseId }: { courseId: string }) {
         />
       </PageContainer>
     );
-  if (!plan.data?.tasks.length || !course.data)
+
+  const isGenerating = generatePlan.isPending;
+
+  if ((!plan.data?.tasks.length || !course.data) && !isGenerating)
     return (
-      <PageContainer className="py-8">
-        <EmptyState />
+      <PageContainer className="py-8 sm:py-10">
+        <header className="mb-7">
+          <p className="text-sm font-medium text-primary">{t("learningPlan")}</p>
+          <h1 className="mt-1 font-heading text-3xl font-semibold tracking-tight">
+            {course.data?.title ?? t("learningPlan")}
+          </h1>
+          <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
+            {t("studentDashboardDescription")}
+          </p>
+        </header>
+        <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-primary/30 bg-muted/30 p-12 text-center">
+          <div className="rounded-full bg-primary/10 p-4 text-primary">
+            <Sparkles className="size-8" />
+          </div>
+          <h2 className="mt-4 text-xl font-semibold">
+            O‘quv rejasi hali shakllanmagan
+          </h2>
+          <p className="mt-2 max-w-md text-sm text-muted-foreground">
+            AI sizning hozirgi ko‘nikmalaringiz va kurs natijalari asosida
+            individual mashqlar va vazifalar rejasini yaratib beradi.
+          </p>
+          <Button
+            className="mt-6"
+            disabled={isGenerating}
+            onClick={() => generatePlan.mutate()}
+          >
+            {isGenerating ? (
+              <Loader2 className="mr-2 size-4 animate-spin" />
+            ) : (
+              <Sparkles className="mr-2 size-4" />
+            )}
+            {isGenerating ? "AI reja tuzmoqda..." : "AI bilan reja yaratish"}
+          </Button>
+        </div>
       </PageContainer>
     );
+
   const outcomes = new Map(
-    course.data.outcomes.map((item) => [item.id, item.title]),
+    (course.data?.outcomes ?? []).map((item) => [item.id, item.title]),
   );
+
   return (
     <PageContainer className="py-8 sm:py-10">
-      <header className="mb-7">
-        <p className="text-sm font-medium text-primary">{t("learningPlan")}</p>
-        <h1 className="mt-1 font-heading text-3xl font-semibold tracking-tight">
-          {course.data.title}
-        </h1>
-        <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
-          {t("studentDashboardDescription")}
-        </p>
+      <header className="mb-7 flex flex-wrap items-start justify-between gap-4">
+        <div>
+          <p className="text-sm font-medium text-primary">{t("learningPlan")}</p>
+          <h1 className="mt-1 font-heading text-3xl font-semibold tracking-tight">
+            {course.data?.title}
+          </h1>
+          <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
+            {t("studentDashboardDescription")}
+          </p>
+        </div>
+        <Button
+          disabled={isGenerating}
+          onClick={() => generatePlan.mutate()}
+          size="sm"
+          variant="outline"
+        >
+          {isGenerating ? (
+            <Loader2 className="mr-2 size-4 animate-spin text-primary" />
+          ) : (
+            <Sparkles className="mr-2 size-4 text-primary" />
+          )}
+          {isGenerating ? "AI yangilamoqda..." : "AI bilan yangilash"}
+        </Button>
       </header>
+
+      {isGenerating ? (
+        <Card className="mb-6 border-primary/30 bg-primary/5">
+          <CardContent className="flex items-center gap-3 py-4">
+            <Loader2 className="size-5 animate-spin text-primary" />
+            <p className="text-sm font-medium text-foreground">
+              AI sizning o‘quv natijalaringizni tahlil qilib, yangi reja
+              tuzmoqda...
+            </p>
+          </CardContent>
+        </Card>
+      ) : null}
+
+      <Card className="mb-6 border-primary/20 bg-primary/5">
+        <CardContent className="flex items-start gap-3 py-4">
+          <Sparkles className="mt-0.5 size-5 shrink-0 text-primary" />
+          <div>
+            <p className="text-sm font-semibold text-foreground">
+              AI shaxsiy tahlili va tavsiya:
+            </p>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Reja kurs natijalari, o‘zlashtirish dalillari va kasbiy maqsadlaringiz
+              bo‘yicha bo‘shliqlarni to‘ldirish uchun optimallashtirilgan.
+            </p>
+          </div>
+        </CardContent>
+      </Card>
+
       <ol className="space-y-4">
-        {[...plan.data.tasks]
+        {[...(plan.data?.tasks ?? [])]
           .sort((a, b) => a.order - b.order)
           .map((task) => {
             const Icon = statusIcon[task.status];
