@@ -150,6 +150,8 @@ export const endpoints = {
   decideEndorsement: () =>
     endpoint("decideEndorsement", "POST", "/professors/me/endorsements"),
   surveys: () => endpoint("surveys", "GET", "/surveys"),
+  feedbackMine: () => endpoint("feedbackMine", "GET", "/feedback/me"),
+  createFeedback: () => endpoint("createFeedback", "POST", "/feedback"),
 };
 export type ApiEndpoint = ReturnType<
   (typeof endpoints)[keyof typeof endpoints]

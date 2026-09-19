@@ -10,6 +10,7 @@ import { useSurveys } from "@/features/surveys/queries";
 import { SurveyCard } from "@/features/surveys/components/survey-card";
 import { t } from "@/i18n";
 import type { UserRole } from "@/features/auth/types";
+import { FeedbackPanel } from "@/features/feedback/components/feedback-panel";
 
 export function SurveysScreen({ role }: { role: UserRole }) {
   const surveys = useSurveys(role);
@@ -26,12 +27,6 @@ export function SurveysScreen({ role }: { role: UserRole }) {
           retry={() => void surveys.refetch()}
           title="surveyErrorTitle"
         />
-      </PageContainer>
-    );
-  if (!surveys.data?.length)
-    return (
-      <PageContainer className="py-8">
-        <ContextState title="emptyTitle" description="surveyNoAvailable" />
       </PageContainer>
     );
   return (
@@ -56,6 +51,7 @@ export function SurveysScreen({ role }: { role: UserRole }) {
           </p>
         </CardContent>
       </Card>
+      <FeedbackPanel role={role} />
       <section aria-labelledby="survey-list-title">
         <div className="mb-4 flex items-center gap-2">
           <ClipboardList aria-hidden="true" className="size-5 text-primary" />
@@ -66,11 +62,11 @@ export function SurveysScreen({ role }: { role: UserRole }) {
             {t("navSurveys")}
           </h2>
         </div>
-        <div className="grid gap-4 lg:grid-cols-2">
+        {!surveys.data?.length ? <ContextState title="emptyTitle" description="surveyNoAvailable" /> : <div className="grid gap-4 lg:grid-cols-2">
           {surveys.data.map((survey) => (
             <SurveyCard key={survey.id} survey={survey} />
           ))}
-        </div>
+        </div>}
       </section>
     </PageContainer>
   );

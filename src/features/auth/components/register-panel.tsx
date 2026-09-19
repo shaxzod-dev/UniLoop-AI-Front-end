@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { useMutation } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 
@@ -32,6 +33,7 @@ type FormValues = z.infer<typeof formSchema>;
 
 export function RegisterPanel() {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const loginAsRole = useAuthStore((state) => state.loginAsRole);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
@@ -42,6 +44,7 @@ export function RegisterPanel() {
   const mutation = useMutation({
     mutationFn: (values: FormValues) => register({ name: values.name, email: values.email, password: values.password, role: values.role }),
     onSuccess: (data) => {
+      queryClient.clear();
       useAuthStore.getState().setSession(data.accessToken, data.user);
       router.replace(getDashboardPath(data.user.role));
     },
@@ -49,6 +52,7 @@ export function RegisterPanel() {
 
   function submit(values: FormValues) {
     if (env.useMocks) {
+      queryClient.clear();
       loginAsRole(values.role);
       router.replace(getDashboardPath(values.role));
       return;
