@@ -18,25 +18,32 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { useClassInsight } from "@/features/class-insights/queries";
 import { ProfessorCourseNavigation } from "@/features/courses/components/professor-course-navigation";
-import { useCourse } from "@/features/courses/queries";
+import {
+  useCourse,
+  useDecideEnrollmentRequest,
+  useEnrollmentRequests,
+} from "@/features/courses/queries";
 import { t } from "@/i18n";
 
 export function ProfessorCourseDetail({ courseId }: { courseId: string }) {
   const course = useCourse(courseId, "PROFESSOR");
   const insight = useClassInsight(courseId);
-  if (course.isLoading || insight.isLoading)
+  const enrollmentRequests = useEnrollmentRequests(courseId);
+  const decideEnrollment = useDecideEnrollmentRequest(courseId);
+  if (course.isLoading || insight.isLoading || enrollmentRequests.isLoading)
     return (
       <PageContainer className="py-8">
         <LoadingState cards={4} />
       </PageContainer>
     );
-  if (course.isError || insight.isError)
+  if (course.isError || insight.isError || enrollmentRequests.isError)
     return (
       <PageContainer className="py-8">
         <ErrorState
           retry={() => {
             void course.refetch();
             void insight.refetch();
+            void enrollmentRequests.refetch();
           }}
           title="professorCourseNotFound"
         />
@@ -58,6 +65,9 @@ export function ProfessorCourseDetail({ courseId }: { courseId: string }) {
   const attentionTitle = course.data.outcomes.find(
     (item) => item.id === attention?.outcomeId,
   )?.title;
+  const pendingEnrollmentRequests = (enrollmentRequests.data ?? []).filter(
+    (request) => request.status === "PENDING",
+  );
   return (
     <PageContainer className="py-8 sm:py-10">
       <header className="mb-5 flex flex-col justify-between gap-4 lg:flex-row lg:items-end">
@@ -172,6 +182,67 @@ export function ProfessorCourseDetail({ courseId }: { courseId: string }) {
             </Button>
           </CardContent>
         </Card>
+      </section>
+      <section className="mb-6">
+        <div className="mb-3 flex items-center justify-between gap-3">
+          <h2 className="font-heading text-xl font-semibold">
+            {t("enrollmentRequests")}
+          </h2>
+          <Badge variant="secondary">{pendingEnrollmentRequests.length}</Badge>
+        </div>
+        {pendingEnrollmentRequests.length ? (
+          <div className="grid gap-3 lg:grid-cols-2">
+            {pendingEnrollmentRequests.map((request) => (
+              <Card key={request.id} size="sm">
+                <CardHeader>
+                  <CardTitle>{request.studentName}</CardTitle>
+                  <p className="text-xs text-muted-foreground">
+                    {[request.major, request.faculty, request.university]
+                      .filter(Boolean)
+                      .join(" · ") || t("applicant")}
+                  </p>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex flex-wrap gap-2">
+                    <Button
+                      disabled={decideEnrollment.isPending}
+                      onClick={() =>
+                        decideEnrollment.mutate({
+                          requestId: request.id,
+                          status: "APPROVED",
+                        })
+                      }
+                      size="sm"
+                    >
+                      {t("approveEnrollment")}
+                    </Button>
+                    <Button
+                      disabled={decideEnrollment.isPending}
+                      onClick={() =>
+                        decideEnrollment.mutate({
+                          requestId: request.id,
+                          status: "REJECTED",
+                        })
+                      }
+                      size="sm"
+                      variant="outline"
+                    >
+                      {t("rejectEnrollment")}
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        ) : (
+          <Card size="sm">
+            <CardContent>
+              <p className="text-sm text-muted-foreground">
+                {t("noEnrollmentRequests")}
+              </p>
+            </CardContent>
+          </Card>
+        )}
       </section>
       <section>
         <h2 className="mb-3 font-heading text-xl font-semibold">

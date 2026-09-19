@@ -6,6 +6,8 @@ import {
 } from "@/features/opportunities/adapters";
 import {
   opportunityResponseSchema,
+  clubJoinResponseSchema,
+  clubResponseSchema,
   profileResponseSchema,
   recommendationsResponseSchema,
   recommendationResponseSchema,
@@ -15,6 +17,7 @@ import { endorsementResponseSchema } from "@/features/referrals/contracts";
 import type {
   CareerProfileUpdate,
   RecommendationUpdate,
+  ClubInput,
 } from "@/types/opportunity";
 import type { EndorsementRequestInput } from "@/types/endorsement";
 import { getApiClient, type ApiClient } from "@/lib/api/client";
@@ -47,6 +50,26 @@ export function updateCareerProfile(
     { endpoint: endpoints.careerProfile(), role: "STUDENT", body: input },
     profileResponseSchema,
     adaptProfile,
+  );
+}
+export function createClub(
+  input: ClubInput,
+  client: ApiClient = getApiClient(),
+) {
+  return client.request(
+    { endpoint: endpoints.createClub(), role: "STUDENT", body: input },
+    clubResponseSchema,
+    (dto) => dto.data,
+  );
+}
+export function joinClub(
+  clubId: string,
+  client: ApiClient = getApiClient(),
+) {
+  return client.request(
+    { endpoint: endpoints.joinClub(clubId), role: "STUDENT" },
+    clubJoinResponseSchema,
+    (dto) => dto.data,
   );
 }
 export function updateRecommendation(

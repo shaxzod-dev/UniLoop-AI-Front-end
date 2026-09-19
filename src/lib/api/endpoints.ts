@@ -12,14 +12,40 @@ export const endpoints = {
   register: () => endpoint("register", "POST", "/auth/register"),
   login: () => endpoint("login", "POST", "/auth/login"),
   identity: () => endpoint("identity", "GET", "/auth/me"),
+  onboarding: () => endpoint("onboarding", "POST", "/auth/onboarding"),
   studentDashboard: () =>
     endpoint("studentDashboard", "GET", "/students/me/dashboard"),
   professorDashboard: () =>
     endpoint("professorDashboard", "GET", "/professors/me/dashboard"),
   studentCourses: () =>
     endpoint("studentCourses", "GET", "/students/me/courses"),
+  courseCatalog: () =>
+    endpoint("courseCatalog", "GET", "/students/me/course-catalog"),
+  requestEnrollment: (courseId: string) =>
+    endpoint(
+      "requestEnrollment",
+      "POST",
+      `/students/me/courses/${segment(courseId)}/enrollment-requests`,
+      { courseId },
+    ),
   professorCourses: () =>
     endpoint("professorCourses", "GET", "/professors/me/courses"),
+  createProfessorCourse: () =>
+    endpoint("createProfessorCourse", "POST", "/professors/me/courses"),
+  enrollmentRequests: (courseId: string) =>
+    endpoint(
+      "enrollmentRequests",
+      "GET",
+      `/professors/me/courses/${segment(courseId)}/enrollment-requests`,
+      { courseId },
+    ),
+  decideEnrollmentRequest: (courseId: string, requestId: string) =>
+    endpoint(
+      "decideEnrollmentRequest",
+      "PATCH",
+      `/professors/me/courses/${segment(courseId)}/enrollment-requests/${segment(requestId)}`,
+      { courseId, requestId },
+    ),
   courseDetail: (courseId: string, role: "STUDENT" | "PROFESSOR" = "STUDENT") =>
     endpoint(
       "courseDetail",
@@ -127,6 +153,11 @@ export const endpoints = {
     ),
   careerProfile: () =>
     endpoint("careerProfile", "PATCH", "/students/me/career-profile"),
+  createClub: () => endpoint("createClub", "POST", "/students/me/clubs"),
+  joinClub: (clubId: string) =>
+    endpoint("joinClub", "POST", `/students/me/clubs/${segment(clubId)}/join`, {
+      clubId,
+    }),
   recommendations: () =>
     endpoint("recommendations", "GET", "/students/me/recommendations"),
   updateRecommendation: (recommendationId: string) =>

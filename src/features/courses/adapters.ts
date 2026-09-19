@@ -1,11 +1,13 @@
 import { z } from "zod";
 import {
   courseDetailDtoSchema,
+  courseCatalogItemSchema,
   courseSummaryDtoSchema,
   dashboardResponseSchema,
 } from "@/features/courses/contracts";
 import type {
   AcademicDashboard,
+  CourseCatalogItem,
   CourseDetail,
   CourseSummary,
 } from "@/types/course";
@@ -20,6 +22,19 @@ export function adaptCourseSummary(
     professorId: dto.professorId,
     studentCount: dto.studentCount,
     outcomeCount: dto.outcomeCount,
+  };
+}
+export function adaptCourseCatalogItem(
+  dto: z.output<typeof courseCatalogItemSchema>,
+): CourseCatalogItem {
+  return {
+    ...adaptCourseSummary(dto),
+    description: dto.description,
+    professorName: dto.professorName,
+    enrollmentStatus: dto.enrollmentStatus,
+    enrollmentRequestId: dto.enrollmentRequestId,
+    requestedAt: dto.requestedAt,
+    decisionNote: dto.decisionNote,
   };
 }
 export function adaptCourseDetail(

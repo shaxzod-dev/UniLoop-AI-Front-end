@@ -46,7 +46,7 @@ export function RegisterPanel() {
     onSuccess: (data) => {
       queryClient.clear();
       useAuthStore.getState().setSession(data.accessToken, data.user);
-      router.replace(getDashboardPath(data.user.role));
+      router.replace("/onboarding");
     },
   });
 

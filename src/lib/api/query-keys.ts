@@ -15,12 +15,16 @@ export const queryKeys = {
     dashboard: (studentId: string) =>
       ["students", studentId, "dashboard"] as const,
     courses: (studentId: string) => ["students", studentId, "courses"] as const,
+    courseCatalog: (studentId: string) =>
+      ["students", studentId, "course-catalog"] as const,
   },
   professors: {
     dashboard: (professorId: string) =>
       ["professors", professorId, "dashboard"] as const,
     courses: (professorId: string) =>
       ["professors", professorId, "courses"] as const,
+    enrollmentRequests: (professorId: string, courseId: string) =>
+      ["professors", professorId, "courses", courseId, "enrollment-requests"] as const,
     growthPlan: (professorId: string) =>
       ["professors", professorId, "growth-plan"] as const,
   },

@@ -81,6 +81,29 @@ export const opportunitySchema = z.object({
   gapSkillIds: z.array(idSchema),
   collaborative: z.boolean(),
   relatedUserId: idSchema.nullable(),
+  source: z.string().min(1).max(50).nullable().optional(),
+  sourceUrl: z.string().url().nullable().optional(),
+  clubMember: z.boolean().optional(),
+});
+export const clubInputSchema = z
+  .object({
+    title: z.string().trim().min(1).max(160),
+    description: z.string().trim().min(1).max(4000),
+    topic: z.string().trim().min(1).max(200),
+    skills: z.array(z.string().trim().min(1).max(100)).max(12).optional(),
+  })
+  .strict();
+export const clubSchema = z.object({
+  id: idSchema,
+  title: z.string(),
+  topic: z.string(),
+  requiredSkills: z.array(z.string()),
+});
+export const clubJoinSchema = z.object({
+  opportunityId: idSchema,
+  studentId: idSchema,
+  role: z.enum(["OWNER", "MEMBER"]),
+  joinedAt: z.string().datetime(),
 });
 export const recommendationSchema = z.object({
   id: idSchema,
@@ -115,3 +138,5 @@ export const recommendationsResponseSchema = dtoEnvelope(
   z.array(recommendationSchema),
 );
 export const recommendationResponseSchema = dtoEnvelope(recommendationSchema);
+export const clubResponseSchema = dtoEnvelope(clubSchema);
+export const clubJoinResponseSchema = dtoEnvelope(clubJoinSchema);

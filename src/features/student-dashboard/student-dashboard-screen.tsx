@@ -8,7 +8,6 @@ import {
   CheckCircle2,
   Map,
 } from "lucide-react";
-import { EmptyState } from "@/components/feedback/empty-state";
 import { ErrorState } from "@/components/feedback/error-state";
 import { LoadingState } from "@/components/feedback/loading-state";
 import { PageContainer } from "@/components/shared/page-container";
@@ -79,10 +78,58 @@ export function StudentDashboardScreen() {
       </PageContainer>
     );
   const course = courses.data?.[0];
+  const readiness = opportunities.data?.profile.readinessStage;
+  const gap = opportunities.data?.gaps[0];
   if (!course || !courseId)
     return (
-      <PageContainer className="py-8">
-        <EmptyState />
+      <PageContainer className="py-8 sm:py-10">
+        <header className="mb-7">
+          <p className="text-sm font-medium text-primary">
+            {t("academicOverview")}
+          </p>
+          <h1 className="mt-1 font-heading text-3xl font-semibold tracking-tight">
+            {t("welcome")}, {user?.fullName}
+          </h1>
+          <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">
+            {t("studentDashboardDescription")}
+          </p>
+        </header>
+        <div className="grid gap-4 lg:grid-cols-2">
+          <Card className="border-primary/20">
+            <CardHeader>
+              <CardTitle>{t("noCoursesTitle")}</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm leading-6 text-muted-foreground">
+                {t("noCoursesDescription")}
+              </p>
+              <Button asChild className="mt-5" size="sm" variant="outline">
+                <Link href="/student/courses">{t("navCourses")}</Link>
+              </Button>
+            </CardContent>
+          </Card>
+          <Card className="border-primary/20">
+            <CardHeader>
+              <CardTitle>{t("profileReady")}</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm leading-6 text-muted-foreground">
+                {gap?.reason ?? t("profileReadyDescription")}
+              </p>
+              {readiness ? (
+                <Badge className="mt-4" variant="secondary">
+                  {t(readinessPresentation[readiness].label)}
+                </Badge>
+              ) : null}
+              <Button asChild className="mt-5" size="sm">
+                <Link href="/student/opportunities">
+                  <BriefcaseBusiness aria-hidden="true" />
+                  {t("viewCareerOpportunities")}
+                </Link>
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
       </PageContainer>
     );
   const nextTasks = [...(plan.data?.tasks ?? [])]
@@ -91,8 +138,6 @@ export function StudentDashboardScreen() {
   const lowest = mastery.data?.outcomes.reduce((current, item) =>
     item.percentage < current.percentage ? item : current,
   );
-  const readiness = opportunities.data?.profile.readinessStage;
-  const gap = opportunities.data?.gaps[0];
   const recentAssessment = courseDetail.data?.assessments.find(
     (item) => item.type === "DIAGNOSTIC",
   );

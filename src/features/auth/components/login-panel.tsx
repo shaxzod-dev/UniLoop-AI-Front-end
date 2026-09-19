@@ -31,7 +31,7 @@ function BackendLogin() {
     onSuccess: (data) => {
       queryClient.clear();
       useAuthStore.getState().setSession(data.accessToken, data.user);
-      router.replace(getDashboardPath(data.user.role));
+      router.replace(data.user.onboardingCompleted ? getDashboardPath(data.user.role) : "/onboarding");
     },
   });
   return (
