@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
-import { BriefcaseBusiness, GraduationCap, Presentation, UsersRound } from "lucide-react";
+import { BriefcaseBusiness, GraduationCap, Presentation, Sparkles, UsersRound } from "lucide-react";
 
 import { BrandMark } from "@/components/shared/brand-mark";
 import { Button } from "@/components/ui/button";
@@ -18,6 +18,23 @@ import { ApiError } from "@/lib/api/errors";
 function splitValues(value: string) {
   return value.split(",").map((item) => item.trim()).filter(Boolean);
 }
+
+const realStudentProfile = {
+  university: "UrDU",
+  faculty: "AT Fakulteti",
+  major: "AI Data Scientist",
+  studyYear: "2",
+  targetRole: "EdTech",
+  interests: "AI, EdTech, FinTech, Data Science, Engineering",
+  skills: "Next.js, JavaScript, TypeScript",
+};
+
+const realProfessorProfile = {
+  university: "UrDU",
+  department: "AT Fakulteti",
+  title: "Katta o‘qituvchi",
+  expertise: "AI, Data Science, Software Engineering, EdTech",
+};
 
 export function OnboardingPanel() {
   const router = useRouter();
@@ -60,6 +77,21 @@ export function OnboardingPanel() {
 
   if (!hydrated || !user || ("onboardingCompleted" in user && user.onboardingCompleted)) return null;
   const isStudent = user.role === "STUDENT";
+  const fillRealProfile = () => {
+    setUniversity(isStudent ? realStudentProfile.university : realProfessorProfile.university);
+    if (isStudent) {
+      setFaculty(realStudentProfile.faculty);
+      setMajor(realStudentProfile.major);
+      setStudyYear(realStudentProfile.studyYear);
+      setTargetRole(realStudentProfile.targetRole);
+      setInterests(realStudentProfile.interests);
+      setSkills(realStudentProfile.skills);
+      return;
+    }
+    setDepartment(realProfessorProfile.department);
+    setTitle(realProfessorProfile.title);
+    setExpertise(realProfessorProfile.expertise);
+  };
   const submitDisabled = mutation.isPending || !university.trim() ||
     (isStudent ? !faculty.trim() || !major.trim() || !targetRole.trim() : !department.trim() || !title.trim());
 
@@ -82,9 +114,13 @@ export function OnboardingPanel() {
             </div>
 
             <form className="space-y-5" onSubmit={(event) => { event.preventDefault(); if (!submitDisabled) mutation.mutate(); }}>
+              <Button type="button" variant="outline" className="h-10 w-full justify-center text-primary sm:w-auto" onClick={fillRealProfile}>
+                <Sparkles data-icon="inline-start" />
+                Real profilni avtomatik to‘ldirish
+              </Button>
               <div className="grid gap-4 sm:grid-cols-2">
-                <Field label="Universitet" value={university} onChange={setUniversity} placeholder="Masalan, TUIT" required />
-                <Field label={isStudent ? "Fakultet" : "Kafedra"} value={isStudent ? faculty : department} onChange={isStudent ? setFaculty : setDepartment} placeholder={isStudent ? "Kompyuter injiniringi" : "Dasturiy injiniring"} required />
+                <Field label="Universitet" value={university} onChange={setUniversity} placeholder="Masalan, TUIT" autoComplete="organization" required />
+                <Field label={isStudent ? "Fakultet" : "Kafedra"} value={isStudent ? faculty : department} onChange={isStudent ? setFaculty : setDepartment} placeholder={isStudent ? "Kompyuter injiniringi" : "Dasturiy injiniring"} autoComplete="organization-title" required />
               </div>
               {isStudent ? <StudentFields major={major} setMajor={setMajor} studyYear={studyYear} setStudyYear={setStudyYear} targetRole={targetRole} setTargetRole={setTargetRole} interests={interests} setInterests={setInterests} skills={skills} setSkills={setSkills} /> : <ProfessorFields title={title} setTitle={setTitle} expertise={expertise} setExpertise={setExpertise} />}
               {mutation.isError ? <p role="alert" className="text-sm text-destructive">{mutation.error instanceof ApiError ? "Ma’lumotni tekshirib qayta urinib ko‘ring." : "Onboarding yakunlanmadi. Qayta urinib ko‘ring."}</p> : null}
@@ -99,9 +135,9 @@ export function OnboardingPanel() {
   );
 }
 
-function Field({ label, value, onChange, placeholder, required = false }: { label: string; value: string; onChange: (value: string) => void; placeholder: string; required?: boolean }) {
+function Field({ label, value, onChange, placeholder, required = false, autoComplete }: { label: string; value: string; onChange: (value: string) => void; placeholder: string; required?: boolean; autoComplete?: string }) {
   const id = label.toLowerCase().replaceAll(" ", "-");
-  return <div className="space-y-2"><Label htmlFor={id}>{label}</Label><Input id={id} value={value} onChange={(event) => onChange(event.target.value)} placeholder={placeholder} required={required} /></div>;
+  return <div className="space-y-2"><Label htmlFor={id}>{label}</Label><Input id={id} value={value} onChange={(event) => onChange(event.target.value)} placeholder={placeholder} autoComplete={autoComplete} required={required} /></div>;
 }
 
 function StudentFields(props: { major: string; setMajor: (value: string) => void; studyYear: string; setStudyYear: (value: string) => void; targetRole: string; setTargetRole: (value: string) => void; interests: string; setInterests: (value: string) => void; skills: string; setSkills: (value: string) => void }) {
