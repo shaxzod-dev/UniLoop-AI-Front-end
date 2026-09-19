@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, type FormEvent } from "react";
-import { useForm, useWatch } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { ContextState } from "@/components/feedback/context-state";
@@ -47,25 +47,13 @@ export function EndorsementPanel({
       consentToReview: false,
     },
   });
-  const professorId = useWatch({ control: form.control, name: "professorId" });
-  const opportunityId = useWatch({
-    control: form.control,
-    name: "opportunityId",
-  });
-  const duplicate = requests.some(
-    (item) =>
-      item.professorId === professorId &&
-      (item.opportunityId ?? "") === opportunityId &&
-      item.targetRole === profile.targetRole &&
-      (item.status === "REQUESTED" || item.status === "APPROVED"),
-  );
   const careerRecommendations = recommendations.filter(
     (item) =>
       item.opportunity.type === "JOB" || item.opportunity.type === "INTERNSHIP",
   );
   function submit(event: FormEvent<HTMLFormElement>) {
     void form.handleSubmit((values) => {
-      if (locked.current || duplicate) return;
+      if (locked.current) return;
       locked.current = true;
       request.mutate(
         {
@@ -155,12 +143,7 @@ export function EndorsementPanel({
             description="noEndorsementDescription"
           />
         )}
-        {duplicate ? (
-          <p className="text-sm text-muted-foreground">
-            {t("duplicateRequestNote")}
-          </p>
-        ) : (
-          <form className="space-y-4" onSubmit={submit}>
+        <form className="space-y-4" onSubmit={submit}>
             <div>
               <p className="text-xs text-muted-foreground">{t("targetRole")}</p>
               <p className="mt-1 text-sm font-medium">{profile.targetRole}</p>
@@ -232,8 +215,7 @@ export function EndorsementPanel({
             >
               {t("requestEndorsement")}
             </Button>
-          </form>
-        )}
+        </form>
         <MutationFeedback
           pending={request.isPending}
           error={request.isError}

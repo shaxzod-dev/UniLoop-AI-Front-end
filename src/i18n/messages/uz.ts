@@ -430,6 +430,15 @@ export const uz = {
   noGapsDescription:
     "Mavjud dalillarni yangi amaliy ishlar bilan boyitishda davom eting.",
   recommendedCareer: "Dalillarga mos kasbiy imkoniyatlar",
+  profileSummaryEyebrow: "Profil xulosasi",
+  profileSummaryTitle: "Keyingi qadam uchun tayyorgarlik",
+  profileSummarySkills: "dalil bilan ko‘nikma",
+  profileSummaryVerified: "professor tasdiqlagan ko‘nikma",
+  profileSummaryGaps: "rivojlantiriladigan yo‘nalish",
+  profileSummaryGapAction:
+    "Pastdagi tavsiya etilgan aloqalar va mini-loyihadan foydalanib, qolgan dalillarni mustahkamlang.",
+  profileSummaryReadyAction:
+    "Profil amaliy hamkorlikka tayyor. Tavsiya etilgan talabalar bilan bog‘lanib, umumiy loyiha boshlang.",
   careerOpportunityNote:
     "Bu imkoniyatlar rivojlanish yo‘nalishini ko‘rsatadi. Qabul qilish tanlovi ariza yuborish yoki ishga kirishni anglatmaydi.",
   opportunityPeer: "Loyiha hamkori",

@@ -1,6 +1,6 @@
 "use client";
 
-import { MapPin, Search, UsersRound } from "lucide-react";
+import { CheckCircle2, MapPin, Search, UsersRound } from "lucide-react";
 import { useState } from "react";
 import { ContextState } from "@/components/feedback/context-state";
 import { EmptyState } from "@/components/feedback/empty-state";
@@ -28,7 +28,7 @@ import {
   useOpportunityDashboard,
 } from "@/features/opportunities/queries";
 import { t } from "@/i18n";
-import type { ClubCatalogItem } from "@/types/opportunity";
+import type { CareerProfile, ClubCatalogItem, SkillGap } from "@/types/opportunity";
 
 type OpportunitySection = "profile" | "jobs" | "network" | "clubs" | "endorsements";
 
@@ -105,7 +105,7 @@ function OpportunityDashboardContent({ section }: { section?: OpportunitySection
         <AcademicEvidenceLinks />
         <SkillEvidenceList skills={profile.skills} studentLinks />
       </section> : null}
-      {shows("profile") ? <section className="space-y-3">
+      {shows("profile") && projects.length ? <section className="space-y-3">
         <h2 className="font-heading text-xl font-semibold">
           {t("projectEvidence")}
         </h2>
@@ -120,6 +120,7 @@ function OpportunityDashboardContent({ section }: { section?: OpportunitySection
         </p>
         <GapAnalysis gaps={gaps} />
       </section> : null}
+      {shows("profile") ? <ProfileBottomSummary profile={profile} gaps={gaps} /> : null}
       {shows("network") ? <section className="space-y-4">
         <h2 className="font-heading text-xl font-semibold">
           {t("navRecommendedConnections")}
@@ -181,6 +182,46 @@ function OpportunityDashboardContent({ section }: { section?: OpportunitySection
         <ConsentControls consent={profile.consent} />
       </section> : null}
     </PageContainer>
+  );
+}
+
+function ProfileBottomSummary({
+  profile,
+  gaps,
+}: {
+  profile: CareerProfile;
+  gaps: SkillGap[];
+}) {
+  const verifiedSkills = profile.skills.filter((skill) =>
+    skill.sources.some((source) => source.verification === "VERIFIED"),
+  ).length;
+  return (
+    <section className="rounded-2xl border border-primary/15 bg-primary/3 p-5 sm:p-6">
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <p className="text-sm font-medium text-primary">{t("profileSummaryEyebrow")}</p>
+          <h2 className="mt-1 font-heading text-xl font-semibold">{t("profileSummaryTitle")}</h2>
+        </div>
+        <CheckCircle2 aria-hidden="true" className="size-6 text-primary" />
+      </div>
+      <div className="mt-5 grid gap-3 md:grid-cols-3">
+        <div className="rounded-xl bg-background p-4 ring-1 ring-border">
+          <p className="text-2xl font-semibold">{profile.skills.length}</p>
+          <p className="mt-1 text-sm text-muted-foreground">{t("profileSummarySkills")}</p>
+        </div>
+        <div className="rounded-xl bg-background p-4 ring-1 ring-border">
+          <p className="text-2xl font-semibold">{verifiedSkills}</p>
+          <p className="mt-1 text-sm text-muted-foreground">{t("profileSummaryVerified")}</p>
+        </div>
+        <div className="rounded-xl bg-background p-4 ring-1 ring-border">
+          <p className="text-2xl font-semibold">{gaps.length}</p>
+          <p className="mt-1 text-sm text-muted-foreground">{t("profileSummaryGaps")}</p>
+        </div>
+      </div>
+      <p className="mt-5 text-sm leading-6 text-muted-foreground">
+        {gaps.length ? t("profileSummaryGapAction") : t("profileSummaryReadyAction")}
+      </p>
+    </section>
   );
 }
 
